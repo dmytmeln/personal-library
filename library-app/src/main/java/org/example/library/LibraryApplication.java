@@ -18,7 +18,6 @@ public class LibraryApplication {
 
     // todo:
     //  google books api and openlibrary api integrations for fetching books
-    //  admin panel
 
     public static void main(String[] args) {
         SpringApplication.run(LibraryApplication.class, args);
