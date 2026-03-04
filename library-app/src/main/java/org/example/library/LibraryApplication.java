@@ -16,10 +16,6 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 @EnableScheduling
 public class LibraryApplication {
 
-    // todo:
-    //  google books api and openlibrary api integrations for fetching books
-    //  responsive design for mobile
-
     public static void main(String[] args) {
         SpringApplication.run(LibraryApplication.class, args);
     }
