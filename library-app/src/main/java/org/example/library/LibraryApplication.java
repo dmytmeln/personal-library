@@ -18,6 +18,9 @@ public class LibraryApplication {
 
     // todo:
     //  google books api and openlibrary api integrations for fetching books
+    //  feature local book only for user library
+    //  responsive design for mobile
+    //  cover image url review
 
     public static void main(String[] args) {
         SpringApplication.run(LibraryApplication.class, args);
