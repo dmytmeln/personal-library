@@ -72,6 +72,10 @@ public class LibraryBookView {
     @Column(name = "owner_user_id")
     private Integer ownerUserId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", insertable = false, updatable = false)
+    private Category category;
+
     @ManyToMany
     @JoinTable(
             name = "book_authors",

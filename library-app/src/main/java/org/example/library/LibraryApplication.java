@@ -18,7 +18,6 @@ public class LibraryApplication {
 
     // todo:
     //  google books api and openlibrary api integrations for fetching books
-    //  feature local book only for user library
     //  responsive design for mobile
     //  cover image url review
 
