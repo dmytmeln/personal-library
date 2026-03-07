@@ -15,6 +15,7 @@ public class CookieUtils {
                 .path("/")
                 .maxAge(maxAgeMs / 1000)
                 .sameSite("None")
+                .partitioned(true)
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }

@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.library.auth.dto.UserRegisterRequest;
 import org.example.library.exception.BadRequestException;
 import org.example.library.exception.NotFoundException;
-import org.example.library.user.domain.User;
 import org.example.library.user.dto.UpdateProfileRequest;
 import org.example.library.user.dto.UserResponse;
 import org.example.library.user.mapper.UserMapper;

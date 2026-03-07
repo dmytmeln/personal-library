@@ -29,17 +29,7 @@ public interface BookDisplayViewRepository extends JpaRepository<BookDisplayView
               AND b.owner_user_id IS NULL
               AND b.description_vector IS NOT NULL
               AND lb.library_book_id IS NULL
-            ORDER BY
-                (EXISTS (
-                    SELECT 1 FROM book_authors ba
-                    WHERE ba.book_id = b.book_id
-                    AND ba.author_id IN (
-                        SELECT ba2.author_id FROM book_authors ba2
-                        JOIN library_books lb2 ON ba2.book_id = lb2.book_id
-                        WHERE lb2.user_id = :userId
-                    )
-                )) DESC,
-                b.description_vector <=> cast(:vector as vector)
+            ORDER BY b.description_vector <=> cast(:vector as vector)
             LIMIT :limit
             """, nativeQuery = true)
     List<BookDisplayView> findSimilarBooks(float[] vector, String languageCode, Integer userId, int limit);

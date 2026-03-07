@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.example.library.book.dto.BookDto;
 import org.example.library.recommendations.service.RecommendationService;
 import org.example.library.security.UserDetailsImpl;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

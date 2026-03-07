@@ -1,4 +1,4 @@
-import {Component, DestroyRef, inject, OnInit, signal, viewChild} from '@angular/core';
+import {Component, DestroyRef, OnInit, signal, viewChild} from '@angular/core';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {LibraryBookService} from '../services/library-book.service';
 import {LIBRARY_BOOK_STATUSES, LibraryBook, LibraryBookStatus} from '../interfaces/library-book';
@@ -303,7 +303,7 @@ export class LibraryComponent implements OnInit {
     const dialogRef = this.dialog.open(CreateLocalBookDialogComponent, {
       width: '600px',
       autoFocus: false,
-      data: { libraryBook }
+      data: {libraryBook}
     });
 
     dialogRef.afterClosed().pipe(filter(Boolean)).subscribe((dto) => {
@@ -358,7 +358,7 @@ export class LibraryComponent implements OnInit {
 
   openViewBookListDialog() {
     const data: ViewBookListDialogData = {
-      libraryBooks: [], // Todo: pass actual library books to show 'Already in library'
+      libraryBooks: [],
       categoryColumn: 'category.name',
       fetchBooksFn: (options) => this.bookService.getAll(options),
     };

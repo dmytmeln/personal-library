@@ -122,11 +122,11 @@ export class ProfileComponent implements OnInit {
   logout(): void {
     this.authService.logout().subscribe({
       next: () => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/login']);
       },
       error: (error) => {
         console.error('Logout error:', error);
-        this.router.navigate(['/']);
+        this.router.navigate(['/login']);
       }
     });
   }

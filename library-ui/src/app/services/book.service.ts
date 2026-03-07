@@ -18,7 +18,7 @@ export interface BookQueryOptions {
   languages?: string[],
   pagesMin?: number,
   pagesMax?: number
-};
+}
 
 @Injectable({
   providedIn: 'root'

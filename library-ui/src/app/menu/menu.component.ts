@@ -1,9 +1,8 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatToolbar} from '@angular/material/toolbar';
 import {MatAnchor, MatButton, MatIconButton} from '@angular/material/button';
 import {Router, RouterLink, RouterLinkActive} from '@angular/router';
-import {Subscription} from 'rxjs';
 import {AuthService} from '../services/auth.service';
 import {LangService} from '../services/lang.service';
 import {MatMenu, MatMenuItem, MatMenuTrigger} from '@angular/material/menu';

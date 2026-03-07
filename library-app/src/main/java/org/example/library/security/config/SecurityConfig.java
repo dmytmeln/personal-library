@@ -33,7 +33,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/*/auth/**", "/api/v1/books/**", "/api/v1/authors/**", "/api/v1/categories").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/library-books/**", "/api/v1/collections/**", "/api/v1/reading-goals/**", "/api/v1/recommendations/**").hasRole("USER")
+                        .requestMatchers("/api/v1/library-books/**", "/api/v1/collections/**", "/api/v1/reading-goals/**",
+                                "/api/v1/recommendations/**").hasRole("USER")
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll())
                 .exceptionHandling(eh -> eh.authenticationEntryPoint(authEntryPointJwt))

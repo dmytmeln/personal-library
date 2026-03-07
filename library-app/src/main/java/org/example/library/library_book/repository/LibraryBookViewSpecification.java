@@ -1,6 +1,5 @@
 package org.example.library.library_book.repository;
 
-import jakarta.persistence.criteria.Expression;
 import jakarta.persistence.criteria.JoinType;
 import org.example.library.author.domain.Author_;
 import org.example.library.library_book.domain.LibraryBookStatus;

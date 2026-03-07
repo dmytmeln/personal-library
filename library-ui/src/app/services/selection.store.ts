@@ -28,8 +28,4 @@ export class SelectionStore {
     this._selectedIds.set(new Set());
   }
 
-  selectAll(ids: number[]): void {
-    this._selectedIds.set(new Set(ids));
-  }
-
 }

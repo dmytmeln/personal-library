@@ -1,8 +1,6 @@
 package org.example.library.library_book.repository;
 
 import org.example.library.library_book.domain.LibraryBookView;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -12,8 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface LibraryBookViewRepository extends JpaRepository<LibraryBookView, Integer>, JpaSpecificationExecutor<LibraryBookView>, LibraryBookViewRepositoryCustom {
-
-    Page<LibraryBookView> findAllByUserIdAndLanguageCode(Integer userId, String languageCode, Pageable pageable);
 
     @Query("""
             SELECT v
