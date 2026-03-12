@@ -48,7 +48,7 @@ export class CollectionsComponent implements OnInit {
   readonly SHOW_DELAY = 100;
 
   dataSource: CollectionNode[] = [];
-  childrenAccessor = (node: CollectionNode) => node.children;
+  childrenAccessor = (node: CollectionNode) => node.children ?? [];
   hasChild = (_: number, node: CollectionNode) => !!node.children && node.children.length > 0;
 
   private snackCommon: MatSnackCommon;

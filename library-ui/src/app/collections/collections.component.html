@@ -37,7 +37,17 @@
     <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding matTreeNodeToggle
                    [cdkTreeNodeTypeaheadLabel]="node.name">
       <div class="mat-tree-node">
-        <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name">
+        <button mat-icon-button matTreeNodeToggle [matTreeNodeToggleRecursive]="true"
+                [matTooltip]="tree.isExpanded(node) ? t('collapseBranch') : t('expandBranch')"
+                [matTooltipShowDelay]="400"
+                [attr.aria-label]="'Toggle branch'">
+          <mat-icon class="mat-icon-rtl-mirror">
+            {{ tree.isExpanded(node) ? 'unfold_more' : 'unfold_less' }}
+          </mat-icon>
+        </button>
+        <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + node.name"
+                [matTooltip]="tree.isExpanded(node) ? t('collapseCollection') : t('expandCollection')"
+                [matTooltipShowDelay]="400">
           <mat-icon class="mat-icon-rtl-mirror">
             {{ tree.isExpanded(node) ? 'expand_more' : 'chevron_right' }}
           </mat-icon>

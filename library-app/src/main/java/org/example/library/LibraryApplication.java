@@ -19,16 +19,14 @@ public class LibraryApplication {
     // TODO:
     //  додати всі книги автора до бібліотеки
     //  пошук колекцій
-    //  розгорнути конкретну гілку колекції
-    //  виправити аутентифікацію (short-lived tokens, refresh tokens, зменшення кількості запитів сервера від клієнта за рахунок збереження деяких даних в токені)
     //  category/author average rating
     //  review recommendations system
     //  optimize ui
     //  optimize server
     //  optimize db
     //  reduce duplication
-    //  filter by collections
-    //  docker deployment
+    //  filter books by collections
+    //  integrate docker to deployment process
     //  integration with external book APIs (Google Books, Open Library) for searching and adding books
     //  додати можливість додавати книги до бібліотеки за допомогою ISBN (запит до зовнішнього API для отримання даних про книгу)
     //  unit tests
