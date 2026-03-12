@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.library.auth.dto.AuthenticationRequest;
 import org.example.library.auth.dto.AuthenticationResponse;
-import org.example.library.security.UserPrincipal;
-import org.example.library.security.jwt.JwtService;
+import org.example.library.security.UserDetailsImpl;
+import org.example.library.security.jwt.RefreshTokenService;
 import org.example.library.user.mapper.UserMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     private final AuthenticationManager authenticationManager;
-    private final JwtService jwtService;
+    private final RefreshTokenService refreshTokenService;
     private final UserMapper userMapper;
 
 
@@ -27,11 +27,10 @@ public class AuthService {
                         authRequest.getEmail(),
                         authRequest.getPassword()
                 ));
-        var userPrincipal = (UserPrincipal) authentication.getPrincipal();
-        var accessToken = jwtService.generateAccessToken(userPrincipal);
-        var refreshToken = jwtService.generateRefreshToken(userPrincipal.getEmail());
+        var userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        var tokenResponse = refreshTokenService.generateNewTokens(userDetails.user());
         log.info("[LOGIN_SUCCESS] User: {}", authRequest.getEmail());
-        return new AuthenticationResponse(accessToken, refreshToken, userMapper.toResponse(userPrincipal));
+        return new AuthenticationResponse(tokenResponse, userMapper.toResponse(userDetails));
     }
 
 }

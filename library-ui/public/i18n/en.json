@@ -56,7 +56,8 @@
     },
     "success": {
       "saved": "Saved successfully",
-      "deleted": "Deleted successfully"
+      "deleted": "Deleted successfully",
+      "logout": "Logged out successfully"
     }
   },
   "dialogs": {

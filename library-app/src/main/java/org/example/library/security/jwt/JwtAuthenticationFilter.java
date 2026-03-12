@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.example.library.security.util.CookieUtils;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContext;
@@ -22,10 +22,8 @@ import java.util.Optional;
 @Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    @Value("${application.security.jwt.cookie-name}")
-    private String cookieName;
-
     private final AuthenticationManager authenticationManager;
+    private final CookieUtils cookieUtils;
 
 
     @Override
@@ -33,10 +31,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
-        var jwtToken = getJwtTokenFromHeader(request);
+        var jwtToken = getJwtTokenFromCookie(request);
 
         if (jwtToken.isPresent()) {
-            log.debug("[JWT] Token extracted from request: {}", request.getRequestURI());
+            log.debug("[JWT] Token extracted from cookie for request: {}", request.getRequestURI());
             setSecurityContext(JwtTokenAuthentication.unauthenticated(jwtToken.get()));
         } else {
             log.debug("[JWT] No accessToken found in request: {}", request.getRequestURI());
@@ -50,12 +48,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.setContext(context);
     }
 
-    private Optional<String> getJwtTokenFromHeader(HttpServletRequest request) {
-        String authHeader = request.getHeader("Authorization");
-        if (authHeader == null || !authHeader.startsWith("Bearer "))
-            return Optional.empty();
-
-        return Optional.of(authHeader.substring(7));
+    private Optional<String> getJwtTokenFromCookie(HttpServletRequest request) {
+        return cookieUtils.getCookieValue(request, cookieUtils.getAccessTokenCookieName());
     }
 
 }

@@ -1,35 +1,28 @@
 import {Injectable, signal} from '@angular/core';
-import {Observable} from 'rxjs';
-import {map, tap} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
+import {catchError, switchMap, tap} from 'rxjs/operators';
 import {ApiService} from './api.service';
 import {UserRegisterRequest} from '../interfaces/user-register-request';
 import {UserResponse, UserRole} from '../interfaces/user-response';
 import {AuthenticationRequest} from '../interfaces/authentication-request';
-import {AuthenticationResponse} from '../interfaces/authentication-response';
 import {UpdateProfileRequest} from '../interfaces/update-profile-request';
-import {UserUpdateResponse} from '../interfaces/user-update-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private readonly ACCESS_TOKEN_KEY = 'auth_access_token';
-  private readonly REFRESH_TOKEN_KEY = 'auth_refresh_token';
-
   currentUser = signal<UserResponse | null>(null);
 
   constructor(private apiService: ApiService) {
   }
 
-  login(credentials: AuthenticationRequest): Observable<AuthenticationResponse> {
-    return this.apiService.post<AuthenticationResponse>('/auth/authenticate', {
+  login(credentials: AuthenticationRequest): Observable<UserResponse> {
+    return this.apiService.post<UserResponse>('/auth/authenticate', {
       body: credentials
     }).pipe(
       tap(response => {
-        localStorage.setItem(this.ACCESS_TOKEN_KEY, response.accessToken);
-        localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
-        this.currentUser.set(response.userResponse);
+        this.currentUser.set(response);
       })
     );
   }
@@ -41,25 +34,30 @@ export class AuthService {
   }
 
   updateProfile(request: UpdateProfileRequest): Observable<UserResponse> {
-    return this.apiService.patch<UserUpdateResponse>('/users/me', {
+    return this.apiService.patch<UserResponse>('/users/me', {
       body: request
     }).pipe(
-      tap(response => {
-        if (response.accessToken) {
-          localStorage.setItem(this.ACCESS_TOKEN_KEY, response.accessToken);
-        }
-        if (response.refreshToken) {
-          localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
-        }
-        this.currentUser.set(response.user);
-      }),
-      map(response => response.user)
+      tap(response => this.currentUser.set(response))
     );
   }
 
-  logout(): void {
-    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
-    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+  private getCurrentUser(): Observable<UserResponse> {
+    return this.apiService.get<UserResponse>('/users/me', {});
+  }
+
+  logout(): Observable<void> {
+    return this.apiService.post<void>('/auth/logout', {}).pipe(
+      tap(() => {
+        this.logoutLocally();
+      })
+    );
+  }
+
+  refreshToken(): Observable<void> {
+    return this.apiService.post<void>('/auth/refresh', {});
+  }
+
+  logoutLocally(): void {
     this.currentUser.set(null);
   }
 
@@ -71,16 +69,18 @@ export class AuthService {
     return this.currentUser()?.role === UserRole.USER;
   }
 
-  getToken(): string | null {
-    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
-  }
+  isAuthenticated(): Observable<boolean> {
+    if (!!this.currentUser()) {
+      return of(true);
+    }
 
-  isAuthenticated(): boolean {
-    return this.hasToken();
-  }
-
-  private hasToken(): boolean {
-    return !!localStorage.getItem(this.ACCESS_TOKEN_KEY);
+    return this.getCurrentUser().pipe(
+      switchMap((response) => {
+        this.currentUser.set(response);
+        return of(true);
+      }),
+      catchError(() => of(false))
+    );
   }
 
 }

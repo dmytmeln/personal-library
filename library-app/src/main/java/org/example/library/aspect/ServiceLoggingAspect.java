@@ -19,22 +19,22 @@ public class ServiceLoggingAspect {
         var className = signature.getDeclaringTypeName();
         var methodName = signature.getName();
         var args = Arrays.toString(joinPoint.getArgs());
-        
+
         log.debug("[SERVICE] Enter: {}.{} with args: {}", className, methodName, args);
-        
+
         var startTime = System.currentTimeMillis();
-        
+
         try {
             var result = joinPoint.proceed();
             var executionTime = System.currentTimeMillis() - startTime;
-            
+
             log.debug("[SERVICE] Exit: {}.{} in {}ms", className, methodName, executionTime);
-            
+
             return result;
         } catch (Throwable throwable) {
             var executionTime = System.currentTimeMillis() - startTime;
             log.error("[SERVICE] Exit: {}.{} in {}ms with exception: {}",
-                    className, methodName, executionTime, throwable.getClass().getSimpleName(), throwable);
+                    className, methodName, executionTime, throwable.getClass().getSimpleName());
             throw throwable;
         }
     }

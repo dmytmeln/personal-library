@@ -12,7 +12,7 @@ import {MAT_DIALOG_DEFAULT_OPTIONS} from '@angular/material/dialog';
 import {TranslocoHttpLoader} from './transloco-loader';
 import {provideTransloco} from '@jsverse/transloco';
 import {LangInterceptor} from './services/lang.interceptor';
-import {JwtInterceptor} from './services/jwt.interceptor';
+import {AuthInterceptor} from './services/auth.interceptor';
 import {MatPaginatorIntl} from '@angular/material/paginator';
 import {TranslocoPaginatorIntl} from './services/transloco-paginator-intl';
 import {provideTranslocoMessageformat} from '@jsverse/transloco-messageformat';
@@ -36,7 +36,7 @@ export const appConfig: ApplicationConfig = {
     },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: JwtInterceptor,
+      useClass: AuthInterceptor,
       multi: true,
     },
     {

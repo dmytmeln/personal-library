@@ -2,13 +2,14 @@ package org.example.library.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.library.auth.dto.AuthenticationResponse;
+import org.example.library.auth.dto.TokenResponse;
 import org.example.library.auth.dto.UserRegisterRequest;
 import org.example.library.exception.BadRequestException;
 import org.example.library.exception.NotFoundException;
 import org.example.library.security.jwt.RefreshTokenService;
 import org.example.library.user.dto.UpdateProfileRequest;
 import org.example.library.user.dto.UserResponse;
-import org.example.library.user.dto.UserUpdateResponse;
 import org.example.library.user.mapper.UserMapper;
 import org.example.library.user.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,7 +39,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserUpdateResponse updateProfile(Integer userId, UpdateProfileRequest request) {
+    public AuthenticationResponse updateProfile(Integer userId, UpdateProfileRequest request) {
         var user = repository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("error.user.not_found"));
 
@@ -49,20 +50,13 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setFullName(request.getFullName());
 
-        String newAccessToken = null;
-        String newRefreshToken = null;
+        TokenResponse tokenResponse = null;
         if (!oldEmail.equalsIgnoreCase(user.getEmail())) {
-            var tokenResponse = refreshTokenService.issueTokensOnEmailUpdate(user);
-            newAccessToken = tokenResponse.accessToken();
-            newRefreshToken = tokenResponse.refreshToken();
+            tokenResponse = refreshTokenService.issueTokensOnEmailUpdate(user);
         }
 
         log.info("[PROFILE_UPDATE_SUCCESS] User ID: {}", userId);
-        return UserUpdateResponse.builder()
-                .user(mapper.toResponse(user))
-                .accessToken(newAccessToken)
-                .refreshToken(newRefreshToken)
-                .build();
+        return new AuthenticationResponse(tokenResponse, mapper.toResponse(user));
     }
 
 }

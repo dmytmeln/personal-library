@@ -104,8 +104,16 @@ export class ProfileComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
+    this.authService.logout().subscribe({
+      next: () => {
+        this.snackCommon.showSuccess(this.translocoService.translate('common.success.logout'));
+        this.router.navigate(['/login']);
+      },
+      error: (error) => {
+        this.snackCommon.showError(error);
+        this.router.navigate(['/login']);
+      }
+    });
   }
 
 }

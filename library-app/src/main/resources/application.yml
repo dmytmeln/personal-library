@@ -42,10 +42,12 @@ application:
   security:
     jwt:
       secret-key: ${JWT_SECRET_KEY}
-      access-token-expiration: 1800000
-      refresh-token-expiration: 86400000
-      cookie-name: ${JWT_COOKIE_NAME:jwt}
-      token-cleanup-cron: "0 0 3 * * ?" # 3:00 AM daily
+      access-expiration: 1800000
+      refresh-expiration: 86400000
+      access-cookie-name: library_app_jwt_access_token
+      refresh-cookie-name: library_app_jwt_refresh_token
+      refresh-id-cookie-name: library_app_jwt_refresh_id
+      token-cleanup-cron: "0 0 3 * * ?"
 
 management:
   endpoints:

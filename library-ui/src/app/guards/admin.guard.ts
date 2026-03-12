@@ -4,6 +4,7 @@ import {AuthService} from '../services/auth.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSnackCommon} from '../common/mat-snack-common';
 import {TranslocoService} from '@jsverse/transloco';
+import {map, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,18 +22,22 @@ export class AdminGuard implements CanActivate {
     this.matSnackCommon = new MatSnackCommon(matSnackBar);
   }
 
-  canActivate(): boolean | UrlTree {
-    if (!this.authService.isAuthenticated()) {
-      this.matSnackCommon.showError(this.translocoService.translate('auth.login.required'));
-      return this.router.createUrlTree(['/login']);
-    }
+  canActivate(): Observable<boolean | UrlTree> {
+    return this.authService.isAuthenticated().pipe(
+      map(isAuthenticated => {
+        if (!isAuthenticated) {
+          this.matSnackCommon.showError(this.translocoService.translate('auth.login.required'));
+          return this.router.createUrlTree(['/login']);
+        }
 
-    if (this.authService.isUser()) {
-      this.matSnackCommon.showError(this.translocoService.translate('auth.admin.required'));
-      return this.router.createUrlTree(['/']);
-    }
+        if (!this.authService.isAdmin()) {
+          this.matSnackCommon.showError(this.translocoService.translate('auth.admin.required'));
+          return this.router.createUrlTree(['/']);
+        }
 
-    return this.authService.isAdmin();
+        return true;
+      })
+    );
   }
 
 }
