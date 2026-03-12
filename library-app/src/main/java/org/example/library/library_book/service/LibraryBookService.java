@@ -14,11 +14,7 @@ import org.example.library.exception.NotFoundException;
 import org.example.library.library_book.domain.LibraryBook;
 import org.example.library.library_book.domain.LibraryBookStatus;
 import org.example.library.library_book.domain.LibraryBookView;
-import org.example.library.library_book.dto.CreateLocalBookDto;
-import org.example.library.library_book.dto.UpdateLocalBookDto;
-import org.example.library.library_book.dto.LibraryBookDto;
-import org.example.library.library_book.dto.LibraryBookSearchCriteria;
-import org.example.library.library_book.dto.UpdateLibraryBookDetailsDto;
+import org.example.library.library_book.dto.*;
 import org.example.library.library_book.mapper.LibraryBookMapper;
 import org.example.library.library_book.repository.LibraryBookRepository;
 import org.example.library.library_book.repository.LibraryBookViewRepository;
@@ -27,7 +23,7 @@ import org.example.library.pagination.PageRequestBuilder;
 import org.example.library.pagination.PaginationParams;
 import org.example.library.pagination.SortableFields;
 import org.example.library.recommendations.event.UserProfileUpdatedEvent;
-import org.example.library.user.domain.User;
+import org.example.library.user.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
@@ -50,6 +46,7 @@ public class LibraryBookService {
     private final LibraryBookRepository repository;
     private final LibraryBookViewRepository viewRepository;
     private final CollectionBookRepository collectionBookRepository;
+    private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
@@ -75,9 +72,9 @@ public class LibraryBookService {
     }
 
     @Transactional
-    public void createLocalBook(CreateLocalBookDto dto, User user) {
+    public void createLocalBook(CreateLocalBookDto dto, Integer userId) {
         var book = new Book();
-        book.setOwner(user);
+        book.setOwner(userRepository.getReferenceById(userId));
         book.setStatus(BookStatus.NEW);
         book.setPopularityCount(0);
 
@@ -91,7 +88,7 @@ public class LibraryBookService {
 
         var savedBook = bookRepository.save(book);
 
-        var libraryBook = LibraryBook.of(savedBook, user);
+        var libraryBook = LibraryBook.of(savedBook, userRepository.getReferenceById(userId));
         libraryBook.setStatus(dto.getStatus());
         libraryBook.setTitle(dto.getTitle());
         libraryBook.setDescription(dto.getDescription());
@@ -102,32 +99,32 @@ public class LibraryBookService {
         libraryBook.setCustomAuthorName(dto.getCustomAuthorName());
 
         repository.save(libraryBook);
-        log.info("[LIBRARY_BOOK_LOCAL_CREATE] User ID: {}, Book ID: {}", user.getId(), savedBook.getId());
+        log.info("[LIBRARY_BOOK_LOCAL_CREATE] User ID: {}, Book ID: {}", userId, savedBook.getId());
     }
 
     @Transactional
-    public void create(Integer bookId, User user) {
-        if (repository.existsByBookIdAndUserId(bookId, user.getId()))
+    public void create(Integer bookId, Integer userId) {
+        if (repository.existsByBookIdAndUserId(bookId, userId))
             throw new BadRequestException("error.library_book.already_added");
 
         var book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new NotFoundException("error.book.not_found"));
 
-        if (book.getOwner() != null && !book.getOwner().getId().equals(user.getId()))
+        if (book.getOwner() != null && !book.getOwner().getId().equals(userId))
             throw new BadRequestException("error.library_book.access_denied");
 
-        repository.save(LibraryBook.of(book, user));
+        repository.save(LibraryBook.of(book, userRepository.getReferenceById(userId)));
 
         if (book.getOwner() == null) {
             incrementPopularity(List.of(bookId));
-            eventPublisher.publishEvent(new UserProfileUpdatedEvent(user.getId()));
+            eventPublisher.publishEvent(new UserProfileUpdatedEvent(userId));
         }
-        log.info("[LIBRARY_BOOK_ADD] User ID: {}, Book ID: {}", user.getId(), bookId);
+        log.info("[LIBRARY_BOOK_ADD] User ID: {}, Book ID: {}", userId, bookId);
     }
 
     @Transactional
-    public void bulkAdd(List<Integer> bookIds, User user) {
-        var existingIds = repository.findExistingBookIdsInLibrary(user.getId(), bookIds);
+    public void bulkAdd(List<Integer> bookIds, Integer userId) {
+        var existingIds = repository.findExistingBookIdsInLibrary(userId, bookIds);
         var newBookIds = bookIds.stream()
                 .filter(id -> !existingIds.contains(id))
                 .distinct()
@@ -140,13 +137,13 @@ public class LibraryBookService {
             throw new NotFoundException("error.book.none_found");
 
         var accessibleBooks = books.stream()
-                .filter(b -> b.getOwner() == null || b.getOwner().getId().equals(user.getId()))
+                .filter(b -> b.getOwner() == null || b.getOwner().getId().equals(userId))
                 .toList();
 
         if (accessibleBooks.isEmpty()) return;
 
         var libraryBooks = accessibleBooks.stream()
-                .map(book -> LibraryBook.of(book, user))
+                .map(book -> LibraryBook.of(book, userRepository.getReferenceById(userId)))
                 .toList();
 
         repository.saveAll(libraryBooks);
@@ -158,9 +155,9 @@ public class LibraryBookService {
 
         if (!globalBookIds.isEmpty()) {
             incrementPopularity(globalBookIds);
-            eventPublisher.publishEvent(new UserProfileUpdatedEvent(user.getId()));
+            eventPublisher.publishEvent(new UserProfileUpdatedEvent(userId));
         }
-        log.info("[LIBRARY_BOOK_BULK_ADD] User ID: {}, Accessible Book IDs: {}", user.getId(), accessibleBooks.stream().map(Book::getId).toList());
+        log.info("[LIBRARY_BOOK_BULK_ADD] User ID: {}, Accessible Book IDs: {}", userId, accessibleBooks.stream().map(Book::getId).toList());
     }
 
     @Transactional
@@ -220,9 +217,9 @@ public class LibraryBookService {
                 .orElseThrow(() -> new NotFoundException("error.library_book.not_found"));
 
         var book = libraryBook.getBook();
-        
+
         if (book.getOwner() == null || !book.getOwner().getId().equals(userId))
-             throw new BadRequestException("error.library_book.access_denied");
+            throw new BadRequestException("error.library_book.access_denied");
 
         book.setPublishYear(dto.getPublishYear());
         book.setPages(dto.getPages());
@@ -238,7 +235,7 @@ public class LibraryBookService {
         } else {
             book.getAuthors().clear();
         }
-        
+
         bookRepository.save(book);
 
         libraryBook.setTitle(dto.getTitle());

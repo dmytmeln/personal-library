@@ -38,7 +38,6 @@ import {MatSnackCommon} from '../common/mat-snack-common';
 export class ProfileComponent implements OnInit {
 
   user = signal<UserResponse | null>(null);
-  loading = signal<boolean>(true);
   isEditing = signal<boolean>(false);
   saving = signal<boolean>(false);
 
@@ -59,28 +58,13 @@ export class ProfileComponent implements OnInit {
     private authService: AuthService,
     private router: Router,
     private translocoService: TranslocoService,
-    private matSnackBar: MatSnackBar,
+    matSnackBar: MatSnackBar,
   ) {
     this.snackCommon = new MatSnackCommon(matSnackBar);
   }
 
   ngOnInit(): void {
-    this.loadUserProfile();
-  }
-
-  loadUserProfile(): void {
-    this.loading.set(true);
-    this.authService.getCurrentUser().subscribe({
-      next: (user) => {
-        this.user.set(user);
-        this.loading.set(false);
-      },
-      error: (error) => {
-        this.snackCommon.showError(this.translocoService.translate('profile.loadError'));
-        this.loading.set(false);
-        console.error('Error loading profile:', error);
-      }
-    });
+    this.user.set(this.authService.currentUser());
   }
 
   toggleEdit(): void {
@@ -120,15 +104,8 @@ export class ProfileComponent implements OnInit {
   }
 
   logout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
-      error: (error) => {
-        console.error('Logout error:', error);
-        this.router.navigate(['/login']);
-      }
-    });
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
 }

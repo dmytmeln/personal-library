@@ -14,7 +14,7 @@ import org.example.library.collection_book.repository.CollectionBookRepository;
 import org.example.library.exception.BadRequestException;
 import org.example.library.exception.NotFoundException;
 import org.example.library.library_book.repository.LibraryBookRepository;
-import org.example.library.user.domain.User;
+import org.example.library.user.repository.UserRepository;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +35,7 @@ public class CollectionService {
     private final CollectionRepository collectionRepository;
     private final CollectionBookRepository collectionBookRepository;
     private final LibraryBookRepository libraryBookRepository;
+    private final UserRepository userRepository;
     private final CollectionMapper collectionMapper;
 
 
@@ -84,12 +85,12 @@ public class CollectionService {
     }
 
     @Transactional
-    public BasicCollectionDto createCollection(CreateCollectionRequest dto, User user) {
+    public BasicCollectionDto createCollection(CreateCollectionRequest dto, Integer userId) {
         var newCollection = collectionMapper.toEntity(dto);
-        newCollection.setUser(user);
+        newCollection.setUser(userRepository.getReferenceById(userId));
 
         if (dto.getParentId() != null) {
-            if (!collectionRepository.existsByIdAndUserId(dto.getParentId(), user.getId()))
+            if (!collectionRepository.existsByIdAndUserId(dto.getParentId(), userId))
                 throw new NotFoundException("error.collection.parent_not_found");
 
             int parentDepth = collectionRepository.getDepth(dto.getParentId());
@@ -100,7 +101,7 @@ public class CollectionService {
         }
 
         var savedCollection = collectionRepository.save(newCollection);
-        log.info("[COLLECTION_CREATE] User ID: {}, Collection ID: {}", user.getId(), savedCollection.getId());
+        log.info("[COLLECTION_CREATE] User ID: {}, Collection ID: {}", userId, savedCollection.getId());
         return collectionMapper.toBasicDto(savedCollection);
     }
 

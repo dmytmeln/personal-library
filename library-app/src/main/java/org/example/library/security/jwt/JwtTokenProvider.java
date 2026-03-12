@@ -5,8 +5,6 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,17 +12,18 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider implements AuthenticationProvider {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
 
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         var jwtAuth = (JwtTokenAuthentication) authentication;
-        if (!jwtService.isTokenValid(jwtAuth.getToken()))
+        var token = jwtAuth.getToken();
+        jwtAuth.clearCredentials();
+        if (!jwtService.isTokenValid(token))
             throw new BadCredentialsException("error.auth.invalid_jwt_token");
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(jwtService.extractUsername(jwtAuth.getToken()));
-        return new JwtTokenAuthentication(jwtAuth.getToken(), userDetails);
+        var userPrincipal = jwtService.extractUserPrincipal(token);
+        return JwtTokenAuthentication.authenticated(userPrincipal);
     }
 
     @Override

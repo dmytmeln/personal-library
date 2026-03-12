@@ -6,6 +6,7 @@ import org.example.library.category.dto.CategoryWithBooksCount;
 import org.example.library.category.service.CategoryService;
 import org.example.library.pagination.PaginationParams;
 import org.example.library.security.UserDetailsImpl;
+import org.example.library.security.UserPrincipal;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,11 +22,11 @@ public class LibraryCategoryController {
 
     @GetMapping
     public Page<CategoryWithBooksCount> getAll(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             PaginationParams paginationParams,
             CategorySearchParams searchParams
     ) {
-        return service.searchForUser(userDetails.getId(), paginationParams, searchParams);
+        return service.searchForUser(userPrincipal.getId(), paginationParams, searchParams);
     }
 
 }

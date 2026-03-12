@@ -22,7 +22,7 @@ public class LibraryApplication {
     //  розгорнути конкретну гілку колекції
     //  виправити аутентифікацію (short-lived tokens, refresh tokens, зменшення кількості запитів сервера від клієнта за рахунок збереження деяких даних в токені)
     //  category/author average rating
-    //  review recommndations system
+    //  review recommendations system
     //  optimize ui
     //  optimize server
     //  optimize db

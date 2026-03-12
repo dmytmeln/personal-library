@@ -42,7 +42,6 @@ export class ApiService {
     return {
       params: data.params ? data.params : {},
       headers: Object.assign(headers, data.headers ? data.headers : {}),
-      withCredentials: true,
     };
   }
 

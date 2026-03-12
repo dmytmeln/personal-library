@@ -2,7 +2,6 @@ package org.example.library.security.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Optional;
 
 @Component
@@ -35,13 +33,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain) throws ServletException, IOException {
-        var jwtToken = getJwtToken(request);
-        
+        var jwtToken = getJwtTokenFromHeader(request);
+
         if (jwtToken.isPresent()) {
             log.debug("[JWT] Token extracted from request: {}", request.getRequestURI());
-            setSecurityContext(new JwtTokenAuthentication(jwtToken.get()));
+            setSecurityContext(JwtTokenAuthentication.unauthenticated(jwtToken.get()));
         } else {
-            log.debug("[JWT] No token found in request: {}", request.getRequestURI());
+            log.debug("[JWT] No accessToken found in request: {}", request.getRequestURI());
         }
         filterChain.doFilter(request, response);
     }
@@ -52,28 +50,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         SecurityContextHolder.setContext(context);
     }
 
-    private Optional<String> getJwtToken(HttpServletRequest request) {
-        return getJwtTokenFromHeader(request)
-                .or(() -> getJwtTokenFromCookies(request));
-    }
-
     private Optional<String> getJwtTokenFromHeader(HttpServletRequest request) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer "))
             return Optional.empty();
 
         return Optional.of(authHeader.substring(7));
-    }
-
-    private Optional<String> getJwtTokenFromCookies(HttpServletRequest request) {
-        var cookies = request.getCookies();
-        if (cookies == null)
-            return Optional.empty();
-
-        return Arrays.stream(cookies)
-                .filter(cookie -> cookieName.equals(cookie.getName()))
-                .map(Cookie::getValue)
-                .findFirst();
     }
 
 }

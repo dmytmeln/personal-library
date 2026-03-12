@@ -34,19 +34,13 @@ export class MenuComponent {
   constructor(
     public authService: AuthService,
     private langService: LangService,
-    private router: Router
-  ) {}
+    private router: Router,
+  ) {
+  }
 
   logout(): void {
-    this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
-      error: (error) => {
-        console.error('Logout error:', error);
-        this.router.navigate(['/login']);
-      }
-    });
+    this.authService.logout();
+    this.router.navigate(['/login']);
   }
 
   changeLang(lang: string): void {

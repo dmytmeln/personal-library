@@ -7,6 +7,7 @@ import org.example.library.author.dto.CountryWithCount;
 import org.example.library.author.service.AuthorService;
 import org.example.library.pagination.PaginationParams;
 import org.example.library.security.UserDetailsImpl;
+import org.example.library.security.UserPrincipal;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,16 +25,16 @@ public class LibraryAuthorController {
 
     @GetMapping
     public Page<AuthorWithBooksCount> getAll(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             PaginationParams paginationParams,
             AuthorSearchParams searchParams
     ) {
-        return service.searchForUser(userDetails.getId(), paginationParams, searchParams);
+        return service.searchForUser(userPrincipal.getId(), paginationParams, searchParams);
     }
 
     @GetMapping("/countries")
-    public List<CountryWithCount> getCountries(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return service.getCountriesForUser(userDetails.getId());
+    public List<CountryWithCount> getCountries(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return service.getCountriesForUser(userPrincipal.getId());
     }
 
 }

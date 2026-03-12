@@ -42,7 +42,7 @@ export class RegisterComponent {
     private authService: AuthService,
     private router: Router,
     private translocoService: TranslocoService,
-    private matSnackBar: MatSnackBar,
+    matSnackBar: MatSnackBar,
   ) {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -53,27 +53,17 @@ export class RegisterComponent {
   }
 
   onSubmit(): void {
-    if (this.registerForm.valid) {
-      this.authService.register(this.registerForm.value).subscribe({
-        next: () => {
-          const {email, password} = this.registerForm.value;
-          this.authService.login({email, password}).subscribe({
-            next: () => {
-              this.router.navigate(['/']);
-            },
-            error: (error) => {
-              this.snackCommon.showError(this.translocoService.translate('auth.register.loginFailed'));
-              console.error('Auto-login error:', error);
-              this.router.navigate(['/login']);
-            }
-          });
-        },
-        error: (error) => {
-          this.snackCommon.showError(error.error?.message || this.translocoService.translate('auth.register.error'));
-          console.error('Registration error:', error);
-        }
-      });
+    if (!this.registerForm.valid) {
+      return;
     }
+
+    this.authService.register(this.registerForm.value).subscribe({
+      next: () => this.router.navigate(['/login']),
+      error: (error) => {
+        this.snackCommon.showError(error.error?.message || this.translocoService.translate('auth.register.error'));
+        console.error('Registration error:', error);
+      }
+    });
   }
 
 }

@@ -1,34 +1,35 @@
 import {Injectable, signal} from '@angular/core';
-import {BehaviorSubject, Observable, of} from 'rxjs';
-import {catchError, map, tap} from 'rxjs/operators';
-import {environment} from '../../environments/environment';
+import {Observable} from 'rxjs';
+import {map, tap} from 'rxjs/operators';
 import {ApiService} from './api.service';
 import {UserRegisterRequest} from '../interfaces/user-register-request';
-import {UserResponse} from '../interfaces/user-response';
+import {UserResponse, UserRole} from '../interfaces/user-response';
 import {AuthenticationRequest} from '../interfaces/authentication-request';
+import {AuthenticationResponse} from '../interfaces/authentication-response';
 import {UpdateProfileRequest} from '../interfaces/update-profile-request';
+import {UserUpdateResponse} from '../interfaces/user-update-response';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  private cookieName = environment.cookieName;
-
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
+  private readonly ACCESS_TOKEN_KEY = 'auth_access_token';
+  private readonly REFRESH_TOKEN_KEY = 'auth_refresh_token';
 
   currentUser = signal<UserResponse | null>(null);
 
   constructor(private apiService: ApiService) {
   }
 
-  login(credentials: AuthenticationRequest): Observable<void> {
-    return this.apiService.post<void>('/auth/authenticate', {
+  login(credentials: AuthenticationRequest): Observable<AuthenticationResponse> {
+    return this.apiService.post<AuthenticationResponse>('/auth/authenticate', {
       body: credentials
     }).pipe(
-      tap(() => {
-        this.isAuthenticatedSubject.next(true);
-        this.checkAuthStatus().subscribe();
+      tap(response => {
+        localStorage.setItem(this.ACCESS_TOKEN_KEY, response.accessToken);
+        localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
+        this.currentUser.set(response.userResponse);
       })
     );
   }
@@ -40,56 +41,46 @@ export class AuthService {
   }
 
   updateProfile(request: UpdateProfileRequest): Observable<UserResponse> {
-    return this.apiService.patch<UserResponse>('/users/me', {
+    return this.apiService.patch<UserUpdateResponse>('/users/me', {
       body: request
     }).pipe(
-      tap(user => this.currentUser.set(user))
+      tap(response => {
+        if (response.accessToken) {
+          localStorage.setItem(this.ACCESS_TOKEN_KEY, response.accessToken);
+        }
+        if (response.refreshToken) {
+          localStorage.setItem(this.REFRESH_TOKEN_KEY, response.refreshToken);
+        }
+        this.currentUser.set(response.user);
+      }),
+      map(response => response.user)
     );
   }
 
-  logout(): Observable<void> {
-    return this.apiService.post<void>('/auth/logout', {}).pipe(
-      tap(() => {
-        this.isAuthenticatedSubject.next(false);
-        this.currentUser.set(null);
-      })
-    );
-  }
-
-  getCurrentUser(): Observable<UserResponse> {
-    return this.apiService.get<UserResponse>('/users/me', {}).pipe(
-      tap(user => this.currentUser.set(user))
-    );
+  logout(): void {
+    localStorage.removeItem(this.ACCESS_TOKEN_KEY);
+    localStorage.removeItem(this.REFRESH_TOKEN_KEY);
+    this.currentUser.set(null);
   }
 
   isAdmin(): boolean {
-    return this.currentUser()?.role === 'ADMIN';
+    return this.currentUser()?.role === UserRole.ADMIN;
   }
 
   isUser(): boolean {
-    return this.currentUser()?.role === 'USER';
+    return this.currentUser()?.role === UserRole.USER;
   }
 
-  checkAuthStatus(): Observable<boolean> {
-    return this.getCurrentUser().pipe(
-      map(user => {
-        this.isAuthenticatedSubject.next(true);
-        this.currentUser.set(user);
-        return true;
-      }),
-      catchError(() => {
-        this.isAuthenticatedSubject.next(false);
-        this.currentUser.set(null);
-        return of(false);
-      })
-    );
+  getToken(): string | null {
+    return localStorage.getItem(this.ACCESS_TOKEN_KEY);
+  }
+
+  isAuthenticated(): boolean {
+    return this.hasToken();
   }
 
   private hasToken(): boolean {
-    return document.cookie.split(';').some(cookie => {
-      const [name] = cookie.trim().split('=');
-      return name === this.cookieName;
-    });
+    return !!localStorage.getItem(this.ACCESS_TOKEN_KEY);
   }
 
 }

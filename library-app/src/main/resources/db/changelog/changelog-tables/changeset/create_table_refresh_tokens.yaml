@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_table_refresh_tokens
+      author: Dmytro Melnyk
+      changes:
+        - createSequence:
+            sequenceName: refresh_tokens_seq
+            startValue: 1
+            incrementBy: 20
+        - createTable:
+            tableName: refresh_tokens
+            columns:
+              - column:
+                  name: refresh_token_id
+                  type: integer
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: refresh_tokens_pk
+              - column:
+                  name: user_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: refresh_tokens_users_fk
+                    referencedTableName: users
+                    referencedColumnNames: user_id
+              - column:
+                  name: revoked
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expiry_date
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: refresh_token_hash
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+

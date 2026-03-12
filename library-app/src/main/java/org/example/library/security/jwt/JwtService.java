@@ -7,6 +7,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.example.library.security.JwtUserPrincipal;
+import org.example.library.security.UserPrincipal;
+import org.example.library.user.domain.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +17,6 @@ import java.security.Key;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
-import java.util.function.Function;
 
 @Component
 @Slf4j
@@ -24,29 +26,44 @@ public class JwtService {
     private String secretKey;
 
     @Value("${application.security.jwt.access-token-expiration}")
-    private long expirationMs;
+    private long accessTokenExpirationMs;
 
     @Value("${application.security.jwt.refresh-token-expiration}")
     private long refreshTokenExpirationMs;
 
 
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+    public String extractEmail(String refreshToken) {
+        var claims = extractAllClaims(refreshToken);
+        return claims.getSubject();
     }
 
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
-        return claimsResolver.apply(claims);
+    public UserPrincipal extractUserPrincipal(String accessToken) {
+        var claims = extractAllClaims(accessToken);
+        return JwtUserPrincipal.builder()
+                .id(claims.get("id", Integer.class))
+                .email(claims.getSubject())
+                .fullName(claims.get("fullName", String.class))
+                .role(Role.valueOf(claims.get("role", String.class)))
+                .build();
     }
 
-    public String generateToken(String username) {
-        return generateToken(Collections.emptyMap(), username);
+    public String generateAccessToken(UserPrincipal userPrincipal) {
+        Map<String, Object> extraClaims = Map.of(
+                "id", userPrincipal.getId(),
+                "role", userPrincipal.getRole().name(),
+                "fullName", userPrincipal.getFullName()
+        );
+        return generateToken(extraClaims, userPrincipal.getEmail(), accessTokenExpirationMs);
     }
 
-    public String generateToken(Map<String, Object> extraClaims, String username) {
+    public String generateRefreshToken(String email) {
+        return generateToken(Collections.emptyMap(), email, refreshTokenExpirationMs);
+    }
+
+    private String generateToken(Map<String, ?> extraClaims, String subject, long expirationMs) {
         return Jwts.builder()
                 .setClaims(extraClaims)
-                .setSubject(username)
+                .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
@@ -58,9 +75,9 @@ public class JwtService {
             parseToken(token);
             return true;
         } catch (JwtException e) {
-            log.error("Invalid JWT token: {}", e.getMessage(), e);
+            log.error("Invalid JWT accessToken: {}", e.getMessage(), e);
         } catch (IllegalArgumentException e) {
-            log.error("JWT token is null or empty: {}", e.getMessage());
+            log.error("JWT accessToken is null or empty: {}", e.getMessage());
         }
 
         return false;

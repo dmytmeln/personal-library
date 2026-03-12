@@ -2,6 +2,7 @@ package org.example.library.statistics.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.library.security.UserDetailsImpl;
+import org.example.library.security.UserPrincipal;
 import org.example.library.statistics.dto.DashboardStatsDto;
 import org.example.library.statistics.service.StatisticsService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,10 +21,10 @@ public class StatisticsController {
 
     @GetMapping("/dashboard")
     public DashboardStatsDto getDashboardStats(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam Integer year
     ) {
-        return service.getDashboardStats(userDetails.getId(), year);
+        return service.getDashboardStats(userPrincipal.getId(), year);
     }
 
 }

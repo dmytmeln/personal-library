@@ -1,103 +1,94 @@
 <div class="profile-container" *transloco="let t; prefix: 'profile'">
-  @if (!loading() && user()) {
-    <mat-card class="profile-card">
-      <div class="profile-header">
-        <div class="avatar-wrapper">
-          <div class="avatar-circle">
-            <mat-icon>person</mat-icon>
-          </div>
+  <mat-card class="profile-card">
+    <div class="profile-header">
+      <div class="avatar-wrapper">
+        <div class="avatar-circle">
+          <mat-icon>person</mat-icon>
         </div>
-        <h2 class="user-name">{{ user()?.fullName }}</h2>
-        <p class="user-email">{{ user()?.email }}</p>
-
-        @if (!isEditing()) {
-          <button mat-stroked-button color="primary" class="edit-btn" (click)="toggleEdit()">
-            <mat-icon>edit</mat-icon>
-            {{ t('edit') }}
-          </button>
-        }
       </div>
+      <h2 class="user-name">{{ user()?.fullName }}</h2>
+      <p class="user-email">{{ user()?.email }}</p>
 
-      <mat-divider></mat-divider>
-
-      <mat-card-content>
-        @if (isEditing()) {
-          <form [formGroup]="profileForm" class="edit-form" (ngSubmit)="saveProfile()">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{ t('fullName') }}</mat-label>
-              <input matInput formControlName="fullName">
-              @if (profileForm.get('fullName')?.hasError('required')) {
-                <mat-error>{{ t('fullNameRequired') }}</mat-error>
-              }
-              @if (profileForm.get('fullName')?.hasError('minlength')) {
-                <mat-error>{{ t('fullNameMinLength') }}</mat-error>
-              }
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{ t('email') }}</mat-label>
-              <input matInput formControlName="email">
-              @if (profileForm.get('email')?.hasError('required')) {
-                <mat-error>{{ t('emailRequired') }}</mat-error>
-              }
-              @if (profileForm.get('email')?.hasError('email')) {
-                <mat-error>{{ t('emailInvalid') }}</mat-error>
-              }
-            </mat-form-field>
-
-            <div class="form-actions">
-              <button mat-button type="button" (click)="cancelEdit()" [disabled]="saving()">
-                {{ t('cancel') }}
-              </button>
-              <button mat-flat-button color="primary" type="submit" [disabled]="profileForm.invalid || saving()">
-                @if (saving()) {
-                  <mat-spinner diameter="20"></mat-spinner>
-                } @else {
-                  {{ t('save') }}
-                }
-              </button>
-            </div>
-          </form>
-        } @else {
-          <mat-list class="profile-details">
-            <mat-list-item>
-              <mat-icon matListItemIcon class="detail-icon">email</mat-icon>
-              <div matListItemTitle class="detail-label">{{ t('email') }}</div>
-              <div matListItemLine class="detail-value">{{ user()?.email }}</div>
-            </mat-list-item>
-
-            <mat-list-item>
-              <mat-icon matListItemIcon class="detail-icon">badge</mat-icon>
-              <div matListItemTitle class="detail-label">{{ t('fullName') }}</div>
-              <div matListItemLine class="detail-value">{{ user()?.fullName }}</div>
-            </mat-list-item>
-
-            <mat-list-item>
-              <mat-icon matListItemIcon class="detail-icon">admin_panel_settings</mat-icon>
-              <div matListItemTitle class="detail-label">{{ t('role') }}</div>
-              <div matListItemLine class="detail-value">
-                <span class="role-chip">{{ user()?.role }}</span>
-              </div>
-            </mat-list-item>
-          </mat-list>
-        }
-      </mat-card-content>
-
-      <mat-divider></mat-divider>
-
-      <mat-card-actions align="end" *transloco="let c; prefix: 'common'">
-        <button mat-button color="warn" (click)="logout()" class="logout-btn" [disabled]="isEditing()">
-          <mat-icon>logout</mat-icon>
-          <span>{{ c('logout') }}</span>
+      @if (!isEditing()) {
+        <button mat-stroked-button color="primary" class="edit-btn" (click)="toggleEdit()">
+          <mat-icon>edit</mat-icon>
+          {{ t('edit') }}
         </button>
-      </mat-card-actions>
-    </mat-card>
-  }
-
-  @if (loading()) {
-    <div class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>{{ t('loading') }}</p>
+      }
     </div>
-  }
+
+    <mat-divider></mat-divider>
+
+    <mat-card-content>
+      @if (isEditing()) {
+        <form [formGroup]="profileForm" class="edit-form" (ngSubmit)="saveProfile()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ t('fullName') }}</mat-label>
+            <input matInput formControlName="fullName">
+            @if (profileForm.get('fullName')?.hasError('required')) {
+              <mat-error>{{ t('fullNameRequired') }}</mat-error>
+            }
+            @if (profileForm.get('fullName')?.hasError('minlength')) {
+              <mat-error>{{ t('fullNameMinLength') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>{{ t('email') }}</mat-label>
+            <input matInput formControlName="email">
+            @if (profileForm.get('email')?.hasError('required')) {
+              <mat-error>{{ t('emailRequired') }}</mat-error>
+            }
+            @if (profileForm.get('email')?.hasError('email')) {
+              <mat-error>{{ t('emailInvalid') }}</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="form-actions">
+            <button mat-button type="button" (click)="cancelEdit()" [disabled]="saving()">
+              {{ t('cancel') }}
+            </button>
+            <button mat-flat-button color="primary" type="submit" [disabled]="profileForm.invalid || saving()">
+              @if (saving()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                {{ t('save') }}
+              }
+            </button>
+          </div>
+        </form>
+      } @else {
+        <mat-list class="profile-details">
+          <mat-list-item>
+            <mat-icon matListItemIcon class="detail-icon">email</mat-icon>
+            <div matListItemTitle class="detail-label">{{ t('email') }}</div>
+            <div matListItemLine class="detail-value">{{ user()?.email }}</div>
+          </mat-list-item>
+
+          <mat-list-item>
+            <mat-icon matListItemIcon class="detail-icon">badge</mat-icon>
+            <div matListItemTitle class="detail-label">{{ t('fullName') }}</div>
+            <div matListItemLine class="detail-value">{{ user()?.fullName }}</div>
+          </mat-list-item>
+
+          <mat-list-item>
+            <mat-icon matListItemIcon class="detail-icon">admin_panel_settings</mat-icon>
+            <div matListItemTitle class="detail-label">{{ t('role') }}</div>
+            <div matListItemLine class="detail-value">
+              <span class="role-chip">{{ user()?.role }}</span>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      }
+    </mat-card-content>
+
+    <mat-divider></mat-divider>
+
+    <mat-card-actions align="end" *transloco="let c; prefix: 'common'">
+      <button mat-button color="warn" (click)="logout()" class="logout-btn" [disabled]="isEditing()">
+        <mat-icon>logout</mat-icon>
+        <span>{{ c('logout') }}</span>
+      </button>
+    </mat-card-actions>
+  </mat-card>
 </div>

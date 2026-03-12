@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/changelog-indexes/changeset/create_trgm_indexes.yaml
   - include:
       file: db/changelog/changelog-indexes/changeset/create_index_tf_idf_vocabulary.yaml
+  - include:
+      file: db/changelog/changelog-indexes/changeset/create_index_refresh_tokens.yaml

@@ -1,13 +1,13 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
-import { MatCardModule } from '@angular/material/card';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { AuthService } from '../services/auth.service';
+import {Component} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Router, RouterLink} from '@angular/router';
+import {MatCardModule} from '@angular/material/card';
+import {MatInputModule} from '@angular/material/input';
+import {MatButtonModule} from '@angular/material/button';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatIconModule} from '@angular/material/icon';
+import {AuthService} from '../services/auth.service';
 import {TranslocoDirective, TranslocoPipe, TranslocoService} from '@jsverse/transloco';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSnackCommon} from '../common/mat-snack-common';
@@ -40,7 +40,7 @@ export class LoginComponent {
     private authService: AuthService,
     private router: Router,
     private translocoService: TranslocoService,
-    private matSnackBar: MatSnackBar,
+    matSnackBar: MatSnackBar,
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -50,16 +50,17 @@ export class LoginComponent {
   }
 
   onSubmit(): void {
-    if (this.loginForm.valid) {
-      this.authService.login(this.loginForm.value).subscribe({
-        next: () => {
-          this.router.navigate(['/']);
-        },
-        error: (error) => {
-          this.snackCommon.showError(this.translocoService.translate('auth.login.error'));
-          console.error('Login error:', error);
-        }
-      });
+    if (!this.loginForm.valid) {
+      return;
     }
+
+    this.authService.login(this.loginForm.value).subscribe({
+      next: () => this.router.navigate(['/']),
+      error: (error) => {
+        this.snackCommon.showError(this.translocoService.translate('auth.login.error'));
+        console.error('Login error:', error);
+      }
+    });
   }
+
 }

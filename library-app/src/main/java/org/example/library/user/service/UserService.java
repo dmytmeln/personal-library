@@ -5,8 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.library.auth.dto.UserRegisterRequest;
 import org.example.library.exception.BadRequestException;
 import org.example.library.exception.NotFoundException;
+import org.example.library.security.jwt.RefreshTokenService;
 import org.example.library.user.dto.UpdateProfileRequest;
 import org.example.library.user.dto.UserResponse;
+import org.example.library.user.dto.UserUpdateResponse;
 import org.example.library.user.mapper.UserMapper;
 import org.example.library.user.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserService {
 
+    private final RefreshTokenService refreshTokenService;
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper mapper;
@@ -35,19 +38,31 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateProfile(Integer userId, UpdateProfileRequest request) {
+    public UserUpdateResponse updateProfile(Integer userId, UpdateProfileRequest request) {
         var user = repository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("error.user.not_found"));
 
-        if (!user.getEmail().equalsIgnoreCase(request.getEmail()) && repository.existsByEmail(request.getEmail()))
+        var oldEmail = user.getEmail();
+        if (!oldEmail.equalsIgnoreCase(request.getEmail()) && repository.existsByEmail(request.getEmail()))
             throw new BadRequestException("error.auth.email_already_registered");
 
         user.setEmail(request.getEmail());
         user.setFullName(request.getFullName());
 
-        var savedUser = repository.save(user);
+        String newAccessToken = null;
+        String newRefreshToken = null;
+        if (!oldEmail.equalsIgnoreCase(user.getEmail())) {
+            var tokenResponse = refreshTokenService.issueTokensOnEmailUpdate(user);
+            newAccessToken = tokenResponse.accessToken();
+            newRefreshToken = tokenResponse.refreshToken();
+        }
+
         log.info("[PROFILE_UPDATE_SUCCESS] User ID: {}", userId);
-        return mapper.toResponse(savedUser);
+        return UserUpdateResponse.builder()
+                .user(mapper.toResponse(user))
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
     }
 
 }

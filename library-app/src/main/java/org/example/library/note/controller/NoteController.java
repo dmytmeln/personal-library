@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.library.note.dto.NoteDto;
 import org.example.library.note.dto.NoteRequest;
 import org.example.library.note.service.NoteService;
-import org.example.library.security.UserDetailsImpl;
+import org.example.library.security.UserPrincipal;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -20,21 +20,21 @@ public class NoteController {
 
     @GetMapping
     public NoteDto getByLibraryBookId(@RequestParam Integer libraryBookId,
-                                      @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return service.getByLibraryBookId(libraryBookId, userDetails.getId());
+                                      @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return service.getByLibraryBookId(libraryBookId, userPrincipal.getId());
     }
 
     @PutMapping
     public NoteDto createOrUpdate(@Valid @RequestBody NoteRequest request,
-                                  @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return service.createOrUpdate(request, userDetails.getId());
+                                  @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return service.createOrUpdate(request, userPrincipal.getId());
     }
 
     @DeleteMapping
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void delete(@RequestParam Integer libraryBookId,
-                       @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        service.delete(libraryBookId, userDetails.getId());
+                       @AuthenticationPrincipal UserPrincipal userPrincipal) {
+        service.delete(libraryBookId, userPrincipal.getId());
     }
 
 }

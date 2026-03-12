@@ -52,4 +52,5 @@ public class AtLeastOneNotNullValidator implements ConstraintValidator<AtLeastOn
             return null;
         }
     }
+
 }

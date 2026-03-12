@@ -141,12 +141,3 @@ mat-card-actions {
   align-items: center;
   gap: 8px;
 }
-
-.loading-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  color: var(--mat-sys-on-surface-variant);
-  padding: 40px;
-}

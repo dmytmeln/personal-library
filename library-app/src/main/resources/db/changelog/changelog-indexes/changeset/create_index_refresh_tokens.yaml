@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_index_refresh_tokens_user_id
+      author: Dmytro Melnyk
+      changes:
+        - createIndex:
+            indexName: idx_refresh_tokens_user_id
+            tableName: refresh_tokens
+            columns:
+              - column:
+                  name: user_id
+
+  - changeSet:
+      id: create_index_refresh_tokens_expiry_date
+      author: Dmytro Melnyk
+      changes:
+        - createIndex:
+            indexName: idx_refresh_tokens_expiry_date
+            tableName: refresh_tokens
+            columns:
+              - column:
+                  name: expiry_date

@@ -1,6 +1,5 @@
 import {Injectable} from '@angular/core';
 import {CanActivate, Router, UrlTree} from '@angular/router';
-import {map, Observable} from 'rxjs';
 import {AuthService} from '../services/auth.service';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import {MatSnackCommon} from '../common/mat-snack-common';
@@ -22,22 +21,17 @@ export class AuthGuard implements CanActivate {
     this.matSnackCommon = new MatSnackCommon(manSnackBar);
   }
 
-  canActivate(): Observable<boolean | UrlTree> {
-    return this.authService.checkAuthStatus().pipe(
-      map(isAuthenticated => {
-        if (isAuthenticated) {
-          if (this.authService.isUser()) {
-            return true;
-          }
-          if (this.authService.isAdmin()) {
-            return this.router.createUrlTree(['/admin']);
-          }
-          this.matSnackCommon.showError(this.translocoService.translate('auth.user.required'));
-          return this.router.createUrlTree(['/login']);
-        }
-        this.matSnackCommon.showError(this.translocoService.translate('auth.login.required'));
-        return this.router.createUrlTree(['/login']);
-      })
-    );
+  canActivate(): boolean | UrlTree {
+    if (!this.authService.isAuthenticated()) {
+      this.matSnackCommon.showError(this.translocoService.translate('auth.login.required'));
+      return this.router.createUrlTree(['/login']);
+    }
+
+    if (this.authService.isAdmin()) {
+      return this.router.createUrlTree(['/admin']);
+    }
+
+    return this.authService.isUser();
   }
+
 }

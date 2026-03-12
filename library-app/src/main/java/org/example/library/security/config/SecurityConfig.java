@@ -3,6 +3,7 @@ package org.example.library.security.config;
 import lombok.RequiredArgsConstructor;
 import org.example.library.security.jwt.AuthEntryPointJwt;
 import org.example.library.security.jwt.JwtAuthenticationFilter;
+import org.example.library.user.domain.Role;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -32,9 +33,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/*/auth/**", "/api/v1/books/**", "/api/v1/authors/**", "/api/v1/categories").permitAll()
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin/**").hasRole(Role.ADMIN.name())
                         .requestMatchers("/api/v1/library-books/**", "/api/v1/collections/**", "/api/v1/reading-goals/**",
-                                "/api/v1/recommendations/**").hasRole("USER")
+                                "/api/v1/recommendations/**").hasRole(Role.USER.name())
                         .requestMatchers("/api/**").authenticated()
                         .anyRequest().permitAll())
                 .exceptionHandling(eh -> eh.authenticationEntryPoint(authEntryPointJwt))
