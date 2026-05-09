@@ -51,7 +51,7 @@ public class CookieUtils {
                 .secure(true)
                 .path("/")
                 .maxAge(maxAgeMs / 1000)
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
@@ -62,7 +62,7 @@ public class CookieUtils {
                 .secure(true)
                 .path("/")
                 .maxAge(0)
-                .sameSite("Strict")
+                .sameSite("Lax")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }

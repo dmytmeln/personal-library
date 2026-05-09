@@ -1,11 +1,69 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/changelog-extensions/db.changelog-extensions.yaml
+      file: db/changelog/changelog-extensions/changeset/create_pg_trgm_extension.yaml
   - include:
-      file: db/changelog/changelog-tables/db.changelog-tables.yaml
+      file: db/changelog/changelog-extensions/changeset/create_pgvector_extension.yaml
   - include:
-      file: db/changelog/changelog-indexes/db.changelog-indexes.yaml
+      file: db/changelog/changelog-tables/changeset/create_table_authors.yaml
   - include:
-      file: db/changelog/changelog-views/db.changelog-views.yaml
+      file: db/changelog/changelog-tables/changeset/create_table_categories.yaml
   - include:
-      file: db/changelog/changelog-functions/db.changelog-functions.yaml
+      file: db/changelog/changelog-tables/changeset/create_table_books.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/create_table_book_authors.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/create_table_users.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/remove_oauth_from_users.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/create_table_reading_goals.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/create_table_library_books.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/create_table_collections.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/create_table_collection_books.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/create_table_notes.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/create_table_tf_idf.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/create_table_vocabulary_metadata.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/create_table_user_profile_vectors.yaml
+  - include:
+      file: db/changelog/changelog-views/create_view_library_books_view.yaml
+  - include:
+      file: db/changelog/changelog-views/create_view_localized_display_views.yaml
+  - include:
+      file: db/changelog/changelog-indexes/changeset/create_index_collections.yaml
+  - include:
+      file: db/changelog/changelog-indexes/changeset/create_index_library_books.yaml
+  - include:
+      file: db/changelog/changelog-indexes/changeset/create_index_books.yaml
+  - include:
+      file: db/changelog/changelog-indexes/changeset/create_index_books_vectors.yaml
+  - include:
+      file: db/changelog/changelog-indexes/changeset/create_index_book_authors.yaml
+  - include:
+      file: db/changelog/changelog-indexes/changeset/create_index_collection_books.yaml
+  - include:
+      file: db/changelog/changelog-indexes/changeset/create_trgm_indexes.yaml
+  - include:
+      file: db/changelog/changelog-indexes/changeset/create_index_tf_idf_vocabulary.yaml
+  - include:
+      file: db/changelog/changelog-functions/changeset/create_function_get_collection_subtree_ids.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/update_books_and_library_books_for_local.yaml
+  - include:
+      file: db/changelog/changelog-views/drop_view_library_books_views.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/drop_cover_image_url_from_library_books.yaml
+  - include:
+      file: db/changelog/changelog-views/update_views_for_local_books.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/create_table_refresh_tokens.yaml
+  - include:
+      file: db/changelog/changelog-indexes/changeset/create_index_refresh_tokens.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/seed_data.yaml

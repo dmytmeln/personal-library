@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiBaseUrl: 'https://personal-library-app.duckdns.org'
+  apiBaseUrl: 'https://d3w5b1njw4ufgb.cloudfront.net'
 };

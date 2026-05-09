@@ -18,6 +18,7 @@ public class LibraryApplication {
 
     // TODO:
     //  додати всі книги автора до бібліотеки
+    //  pin libraryBook/collection
     //  пошук колекцій
     //  category/author average rating
     //  review recommendations system

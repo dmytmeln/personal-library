@@ -16,7 +16,6 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    // Books
     @GetMapping("/books/{id}")
     public AdminBookDto getBook(@PathVariable Integer id) {
         return adminService.getBook(id);
@@ -45,7 +44,6 @@ public class AdminController {
         adminService.deleteBooks(request.getIds());
     }
 
-    // Authors
     @GetMapping("/authors/{id}")
     public AdminAuthorDto getAuthor(@PathVariable Integer id) {
         return adminService.getAuthor(id);
@@ -74,7 +72,6 @@ public class AdminController {
         adminService.deleteAuthors(request.getIds());
     }
 
-    // Categories
     @GetMapping("/categories/{id}")
     public AdminCategoryDto getCategory(@PathVariable Integer id) {
         return adminService.getCategory(id);

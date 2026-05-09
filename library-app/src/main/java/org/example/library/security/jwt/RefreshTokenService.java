@@ -38,7 +38,6 @@ public class RefreshTokenService {
         var refreshToken = repository.findById(tokenId)
                 .orElseThrow(() -> new BadCredentialsException("Unknown token"));
 
-        // todo localization
         var preHashed = DigestUtils.md5DigestAsHex(rawToken.getBytes(StandardCharsets.UTF_8));
         if (refreshToken.isExpired() || !passwordEncoder.matches(preHashed, refreshToken.getRefreshTokenHash())) {
             throw new BadCredentialsException("Invalid token");

@@ -33,8 +33,7 @@ public class ServiceLoggingAspect {
             return result;
         } catch (Throwable throwable) {
             var executionTime = System.currentTimeMillis() - startTime;
-            log.error("[SERVICE] Exit: {}.{} in {}ms with exception: {}",
-                    className, methodName, executionTime, throwable.getClass().getSimpleName());
+            log.error("[SERVICE] Exit: {}.{} in {}ms with exception", className, methodName, executionTime);
             throw throwable;
         }
     }
