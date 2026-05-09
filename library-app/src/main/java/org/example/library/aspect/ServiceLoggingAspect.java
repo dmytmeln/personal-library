@@ -2,7 +2,6 @@ package org.example.library.aspect;
 
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
@@ -20,22 +19,21 @@ public class ServiceLoggingAspect {
         var className = signature.getDeclaringTypeName();
         var methodName = signature.getName();
         var args = Arrays.toString(joinPoint.getArgs());
-        
+
         log.debug("[SERVICE] Enter: {}.{} with args: {}", className, methodName, args);
-        
+
         var startTime = System.currentTimeMillis();
-        
+
         try {
             var result = joinPoint.proceed();
             var executionTime = System.currentTimeMillis() - startTime;
-            
+
             log.debug("[SERVICE] Exit: {}.{} in {}ms", className, methodName, executionTime);
-            
+
             return result;
         } catch (Throwable throwable) {
             var executionTime = System.currentTimeMillis() - startTime;
-            log.error("[SERVICE] Exit: {}.{} in {}ms with exception: {}",
-                    className, methodName, executionTime, throwable.getClass().getSimpleName(), throwable);
+            log.error("[SERVICE] Exit: {}.{} in {}ms with exception", className, methodName, executionTime);
             throw throwable;
         }
     }

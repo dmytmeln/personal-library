@@ -56,7 +56,8 @@
     },
     "success": {
       "saved": "Saved successfully",
-      "deleted": "Deleted successfully"
+      "deleted": "Deleted successfully",
+      "logout": "Logged out successfully"
     }
   },
   "dialogs": {
@@ -213,6 +214,10 @@
     "title": "Collections",
     "expandAll": "Expand all",
     "collapseAll": "Collapse all",
+    "expandBranch": "Expand branch",
+    "collapseBranch": "Collapse branch",
+    "expandCollection": "Expand collection",
+    "collapseCollection": "Collapse collection",
     "createCollection": "Create collection",
     "goToCollection": "Go to collection",
     "addBook": "Add book",

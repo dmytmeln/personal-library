@@ -129,6 +129,7 @@ export class AuthorDetailsComponent implements OnInit {
     });
   }
 
+  // todo duplicate code
   bulkAddBooks(): void {
     const ids = this.selection.selectedIds();
     this.libraryBookService.bulkAdd(ids).subscribe({

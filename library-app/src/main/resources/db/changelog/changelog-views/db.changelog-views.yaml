@@ -1,7 +1,0 @@
-databaseChangeLog:
-  - include:
-      file: db/changelog/changelog-views/changeset/create_view_library_books_view.yaml
-  - include:
-      file: db/changelog/changelog-views/changeset/create_view_localized_display_views.yaml
-  - include:
-      file: db/changelog/changelog-views/changeset/update_views_for_local_books.yaml

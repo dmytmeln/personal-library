@@ -1,0 +1,66 @@
+name: Spring Boot Deploy
+
+on:
+  push:
+    branches: [ "master" ]
+    paths:
+      - 'library-app/**'
+      - '.github/workflows/spring-boot_deploy.yml'
+
+jobs:
+  deploy:
+    name: Build and run tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build and test
+        working-directory: library-app
+        run: |
+          mvn clean verify
+
+      - name: Rename JAR
+        run: mv library-app/target/*.jar app.jar
+
+      - name: Copy JAR to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "app.jar"
+          target: "/tmp"
+
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo systemctl stop myapp
+            
+            sudo mv /tmp/app.jar /opt/myapp/app.jar
+            sudo chown springboot:springboot /opt/myapp/app.jar
+            
+            sudo systemctl start myapp
+            
+            sleep 10
+            
+            sudo systemctl status myapp --no-pager

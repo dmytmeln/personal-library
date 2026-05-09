@@ -35,9 +35,4 @@ export class LibraryBookMenuItemsComponent {
     private router: Router,
   ) {
   }
-
-  goToBookDetails(book: Book): void {
-    this.router.navigate(['/book-details', book.id]);
-  }
-
 }

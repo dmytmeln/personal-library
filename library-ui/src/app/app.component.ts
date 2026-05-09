@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {MenuComponent} from './menu/menu.component';
 import {LangService} from './services/lang.service';
-import {TranslocoPipe} from '@jsverse/transloco';
 
 @Component({
   selector: 'app-root',
@@ -19,4 +18,5 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     this.langService.loadSaved();
   }
+
 }

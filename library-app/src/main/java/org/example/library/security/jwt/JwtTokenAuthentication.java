@@ -1,41 +1,51 @@
 package org.example.library.security.jwt;
 
 import lombok.Getter;
+import org.example.library.security.UserPrincipal;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public class JwtTokenAuthentication implements Authentication {
 
     @Getter
-    private final String token;
-    private UserDetails userDetails;
+    private String token;
+    private UserPrincipal userPrincipal;
     private boolean authenticated;
 
-    public JwtTokenAuthentication(String token) {
+    private JwtTokenAuthentication(String token) {
         this.token = token;
     }
 
-    public JwtTokenAuthentication(String token, UserDetails userDetails) {
-        this.token = token;
-        this.userDetails = userDetails;
+    private JwtTokenAuthentication(UserPrincipal userPrincipal) {
+        this.userPrincipal = userPrincipal;
         this.authenticated = true;
+    }
+
+    public static JwtTokenAuthentication authenticated(UserPrincipal userPrincipal) {
+        return new JwtTokenAuthentication(userPrincipal);
+    }
+
+    public static JwtTokenAuthentication unauthenticated(String token) {
+        return new JwtTokenAuthentication(token);
     }
 
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Optional.ofNullable(userDetails)
-                .map(UserDetails::getAuthorities)
+        return Optional.ofNullable(userPrincipal)
+                .map(UserPrincipal::getRole)
+                .map(role -> Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name())))
                 .orElseGet(List::of);
     }
 
     @Override
-    public Object getCredentials() {
+    public String getCredentials() {
         return token;
     }
 
@@ -45,8 +55,8 @@ public class JwtTokenAuthentication implements Authentication {
     }
 
     @Override
-    public Object getPrincipal() {
-        return userDetails;
+    public UserPrincipal getPrincipal() {
+        return userPrincipal;
     }
 
     @Override
@@ -63,9 +73,13 @@ public class JwtTokenAuthentication implements Authentication {
 
     @Override
     public String getName() {
-        return Optional.ofNullable(userDetails)
-                .map(UserDetails::getUsername)
+        return Optional.ofNullable(userPrincipal)
+                .map(UserPrincipal::getEmail)
                 .orElse(null);
+    }
+
+    public void clearCredentials() {
+        this.token = null;
     }
 
 }

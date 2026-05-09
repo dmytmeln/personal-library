@@ -1,10 +1,9 @@
 import {Injectable, signal} from '@angular/core';
-import {BehaviorSubject, Observable, of} from 'rxjs';
-import {catchError, map, tap} from 'rxjs/operators';
-import {environment} from '../../environments/environment';
+import {Observable, of} from 'rxjs';
+import {catchError, switchMap, tap} from 'rxjs/operators';
 import {ApiService} from './api.service';
 import {UserRegisterRequest} from '../interfaces/user-register-request';
-import {UserResponse} from '../interfaces/user-response';
+import {UserResponse, UserRole} from '../interfaces/user-response';
 import {AuthenticationRequest} from '../interfaces/authentication-request';
 import {UpdateProfileRequest} from '../interfaces/update-profile-request';
 
@@ -13,22 +12,17 @@ import {UpdateProfileRequest} from '../interfaces/update-profile-request';
 })
 export class AuthService {
 
-  private cookieName = environment.cookieName;
-
-  private isAuthenticatedSubject = new BehaviorSubject<boolean>(this.hasToken());
-
   currentUser = signal<UserResponse | null>(null);
 
   constructor(private apiService: ApiService) {
   }
 
-  login(credentials: AuthenticationRequest): Observable<void> {
-    return this.apiService.post<void>('/auth/authenticate', {
+  login(credentials: AuthenticationRequest): Observable<UserResponse> {
+    return this.apiService.post<UserResponse>('/auth/authenticate', {
       body: credentials
     }).pipe(
-      tap(() => {
-        this.isAuthenticatedSubject.next(true);
-        this.checkAuthStatus().subscribe();
+      tap(response => {
+        this.currentUser.set(response);
       })
     );
   }
@@ -43,53 +37,50 @@ export class AuthService {
     return this.apiService.patch<UserResponse>('/users/me', {
       body: request
     }).pipe(
-      tap(user => this.currentUser.set(user))
+      tap(response => this.currentUser.set(response))
     );
+  }
+
+  private getCurrentUser(): Observable<UserResponse> {
+    return this.apiService.get<UserResponse>('/users/me', {});
   }
 
   logout(): Observable<void> {
     return this.apiService.post<void>('/auth/logout', {}).pipe(
       tap(() => {
-        this.isAuthenticatedSubject.next(false);
-        this.currentUser.set(null);
+        this.logoutLocally();
       })
     );
   }
 
-  getCurrentUser(): Observable<UserResponse> {
-    return this.apiService.get<UserResponse>('/users/me', {}).pipe(
-      tap(user => this.currentUser.set(user))
-    );
+  refreshToken(): Observable<void> {
+    return this.apiService.post<void>('/auth/refresh', {});
+  }
+
+  logoutLocally(): void {
+    this.currentUser.set(null);
   }
 
   isAdmin(): boolean {
-    return this.currentUser()?.role === 'ADMIN';
+    return this.currentUser()?.role === UserRole.ADMIN;
   }
 
   isUser(): boolean {
-    return this.currentUser()?.role === 'USER';
+    return this.currentUser()?.role === UserRole.USER;
   }
 
-  checkAuthStatus(): Observable<boolean> {
+  isAuthenticated(): Observable<boolean> {
+    if (!!this.currentUser()) {
+      return of(true);
+    }
+
     return this.getCurrentUser().pipe(
-      map(user => {
-        this.isAuthenticatedSubject.next(true);
-        this.currentUser.set(user);
-        return true;
+      switchMap((response) => {
+        this.currentUser.set(response);
+        return of(true);
       }),
-      catchError(() => {
-        this.isAuthenticatedSubject.next(false);
-        this.currentUser.set(null);
-        return of(false);
-      })
+      catchError(() => of(false))
     );
-  }
-
-  private hasToken(): boolean {
-    return document.cookie.split(';').some(cookie => {
-      const [name] = cookie.trim().split('=');
-      return name === this.cookieName;
-    });
   }
 
 }

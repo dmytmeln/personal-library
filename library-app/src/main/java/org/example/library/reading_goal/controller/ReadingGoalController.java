@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.library.reading_goal.dto.ReadingGoalDto;
 import org.example.library.reading_goal.service.ReadingGoalService;
 import org.example.library.security.UserDetailsImpl;
+import org.example.library.security.UserPrincipal;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -18,27 +19,27 @@ public class ReadingGoalController {
 
     @GetMapping
     public ReadingGoalDto getGoal(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam Integer year
     ) {
-        return service.getGoal(userDetails.getId(), year);
+        return service.getGoal(userPrincipal.getId(), year);
     }
 
     @PutMapping
     public ReadingGoalDto saveOrUpdate(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestBody ReadingGoalDto dto
     ) {
-        return service.createOrUpdate(dto, userDetails.user());
+        return service.createOrUpdate(dto, userPrincipal.getId());
     }
 
     @DeleteMapping
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void delete(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @RequestParam Integer year
     ) {
-        service.delete(userDetails.getId(), year);
+        service.delete(userPrincipal.getId(), year);
     }
 
 }

@@ -1,12 +1,11 @@
 package org.example.library;
 
+import org.example.library.config.BaseIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles("test")
-class LibraryApplicationTests {
+class LibraryApplicationTests extends BaseIntegrationTest {
 
     @Test
     void contextLoads() {

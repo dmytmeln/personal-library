@@ -3,8 +3,7 @@ package org.example.library.recommendations.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.library.book.dto.BookDto;
 import org.example.library.recommendations.service.RecommendationService;
-import org.example.library.security.UserDetailsImpl;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.example.library.security.UserPrincipal;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,33 +21,34 @@ public class RecommendationsController {
 
 
     @GetMapping
-    public List<BookDto> getRecommendations(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public List<BookDto> getRecommendations(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                             @RequestParam(required = false) Integer limit) {
-        return recommendationService.getRecommendations(userDetails.getId(), limit);
+        return recommendationService.getRecommendations(userPrincipal.getId(), limit);
     }
 
     @GetMapping("/popular")
-    public List<BookDto> getPopularBooks(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public List<BookDto> getPopularBooks(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                          @RequestParam(required = false) Integer limit) {
-        return recommendationService.getPopularBooks(userDetails.getId(), limit);
+        return recommendationService.getPopularBooks(userPrincipal.getId(), limit);
     }
 
     @GetMapping("/new")
-    public List<BookDto> getNewArrivals(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                         @RequestParam(required = false) Integer limit) {
-        return recommendationService.getNewArrivals(userDetails.getId(), limit);
+    public List<BookDto> getNewArrivals(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                        @RequestParam(required = false) Integer limit) {
+        return recommendationService.getNewArrivals(userPrincipal.getId(), limit);
     }
 
     @GetMapping("/trending-genres")
-    public List<BookDto> getTrendingInFavoriteGenres(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                      @RequestParam(required = false) Integer limit) {
-        return recommendationService.getTrendingInFavoriteGenres(userDetails.getId(), limit);
+    public List<BookDto> getTrendingInFavoriteGenres(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                     @RequestParam(required = false) Integer limit) {
+        return recommendationService.getTrendingInFavoriteGenres(userPrincipal.getId(), limit);
     }
+
     @GetMapping("/similar/{bookId}")
-    public List<BookDto> getSimilarBooks(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public List<BookDto> getSimilarBooks(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                          @org.springframework.web.bind.annotation.PathVariable Integer bookId,
                                          @RequestParam(required = false) Integer limit) {
-        return recommendationService.getSimilarBooks(bookId, userDetails.getId(), limit);
+        return recommendationService.getSimilarBooks(bookId, userPrincipal.getId(), limit);
     }
 
 }

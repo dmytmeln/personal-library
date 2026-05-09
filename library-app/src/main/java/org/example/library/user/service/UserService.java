@@ -2,10 +2,12 @@ package org.example.library.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.library.auth.dto.AuthenticationResponse;
+import org.example.library.auth.dto.TokenResponse;
 import org.example.library.auth.dto.UserRegisterRequest;
 import org.example.library.exception.BadRequestException;
 import org.example.library.exception.NotFoundException;
-import org.example.library.user.domain.User;
+import org.example.library.security.jwt.RefreshTokenService;
 import org.example.library.user.dto.UpdateProfileRequest;
 import org.example.library.user.dto.UserResponse;
 import org.example.library.user.mapper.UserMapper;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class UserService {
 
+    private final RefreshTokenService refreshTokenService;
     private final UserRepository repository;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper mapper;
@@ -36,19 +39,24 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse updateProfile(Integer userId, UpdateProfileRequest request) {
+    public AuthenticationResponse updateProfile(Integer userId, UpdateProfileRequest request) {
         var user = repository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("error.user.not_found"));
 
-        if (!user.getEmail().equalsIgnoreCase(request.getEmail()) && repository.existsByEmail(request.getEmail()))
+        var oldEmail = user.getEmail();
+        if (!oldEmail.equalsIgnoreCase(request.getEmail()) && repository.existsByEmail(request.getEmail()))
             throw new BadRequestException("error.auth.email_already_registered");
 
         user.setEmail(request.getEmail());
         user.setFullName(request.getFullName());
 
-        var savedUser = repository.save(user);
+        TokenResponse tokenResponse = null;
+        if (!oldEmail.equalsIgnoreCase(user.getEmail())) {
+            tokenResponse = refreshTokenService.issueTokensOnEmailUpdate(user);
+        }
+
         log.info("[PROFILE_UPDATE_SUCCESS] User ID: {}", userId);
-        return mapper.toResponse(savedUser);
+        return new AuthenticationResponse(tokenResponse, mapper.toResponse(user));
     }
 
 }

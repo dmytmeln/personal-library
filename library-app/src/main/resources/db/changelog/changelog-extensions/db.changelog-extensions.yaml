@@ -1,5 +1,0 @@
-databaseChangeLog:
-  - include:
-      file: db/changelog/changelog-extensions/changeset/create_pg_trgm_extension.yaml
-  - include:
-      file: db/changelog/changelog-extensions/changeset/create_pgvector_extension.yaml

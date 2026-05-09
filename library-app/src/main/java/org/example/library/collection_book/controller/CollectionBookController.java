@@ -7,7 +7,7 @@ import org.example.library.collection_book.service.CollectionBookService;
 import org.example.library.library_book.dto.BulkRequest;
 import org.example.library.library_book.dto.LibraryBookDto;
 import org.example.library.pagination.PaginationParams;
-import org.example.library.security.UserDetailsImpl;
+import org.example.library.security.UserPrincipal;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -23,48 +23,48 @@ public class CollectionBookController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public Page<LibraryBookDto> getCollectionBooks(
-            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @AuthenticationPrincipal UserPrincipal userPrincipal,
             @PathVariable int collectionId,
             CollectionBookSearchParams searchParams,
             PaginationParams paginationParams
     ) {
-        return service.getCollectionBooksPaginated(userDetails.getId(), collectionId, searchParams, paginationParams);
+        return service.getCollectionBooksPaginated(userPrincipal.getId(), collectionId, searchParams, paginationParams);
     }
 
     @PostMapping("/{libraryBookId}")
     @ResponseStatus(HttpStatus.CREATED)
-    public void addBookToCollection(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                                  @PathVariable int collectionId,
-                                                  @PathVariable int libraryBookId
+    public void addBookToCollection(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                    @PathVariable int collectionId,
+                                    @PathVariable int libraryBookId
     ) {
-        service.addBookToCollection(userDetails.getId(), collectionId, libraryBookId);
+        service.addBookToCollection(userPrincipal.getId(), collectionId, libraryBookId);
     }
 
     @PostMapping("/bulk")
     @ResponseStatus(HttpStatus.CREATED)
-    public void bulkAddBooksToCollection(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public void bulkAddBooksToCollection(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                          @PathVariable int collectionId,
                                          @Valid @RequestBody BulkRequest request
     ) {
-        service.bulkAddBooksToCollection(userDetails.getId(), collectionId, request.getIds());
+        service.bulkAddBooksToCollection(userPrincipal.getId(), collectionId, request.getIds());
     }
 
     @DeleteMapping("/{libraryBookId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void removeBookFromCollection(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                          @PathVariable int collectionId,
-                                          @PathVariable int libraryBookId
+    public void removeBookFromCollection(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                         @PathVariable int collectionId,
+                                         @PathVariable int libraryBookId
     ) {
-        service.removeBookFromCollection(userDetails.getId(), collectionId, libraryBookId);
+        service.removeBookFromCollection(userPrincipal.getId(), collectionId, libraryBookId);
     }
 
     @PostMapping("/bulk-remove")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void bulkRemoveBooksFromCollection(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public void bulkRemoveBooksFromCollection(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                               @PathVariable int collectionId,
                                               @Valid @RequestBody BulkRequest request
     ) {
-        service.bulkRemoveBooksFromCollection(userDetails.getId(), collectionId, request.getIds());
+        service.bulkRemoveBooksFromCollection(userPrincipal.getId(), collectionId, request.getIds());
     }
 
 }

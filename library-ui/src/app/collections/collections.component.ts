@@ -48,7 +48,7 @@ export class CollectionsComponent implements OnInit {
   readonly SHOW_DELAY = 100;
 
   dataSource: CollectionNode[] = [];
-  childrenAccessor = (node: CollectionNode) => node.children;
+  childrenAccessor = (node: CollectionNode) => node.children ?? [];
   hasChild = (_: number, node: CollectionNode) => !!node.children && node.children.length > 0;
 
   private snackCommon: MatSnackCommon;
@@ -188,9 +188,10 @@ export class CollectionsComponent implements OnInit {
   }
 
   openAddBookDialog(node: CollectionNode): void {
+    // todo fix (get books by collection)
     this.collectionService.getById(node.id).subscribe(collection => {
       const data: ViewBookListDialogData = {
-        libraryBooks: collection.books.map(cd => cd.libraryBook),
+        libraryBooks: collection.books.map(cd => cd.libraryBook), // todo fix (books undefined)
         categoryColumn: 'categoryName',
         fetchBooksFn: (options) => this.libraryBookService.getAll(options),
       };
@@ -238,4 +239,5 @@ export class CollectionsComponent implements OnInit {
     }
     return null;
   }
+
 }

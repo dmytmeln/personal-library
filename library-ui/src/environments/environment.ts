@@ -1,4 +1,3 @@
 export const environment = {
-  apiBaseUrl: 'http://localhost:8080',
-  cookieName: 'jwt'
+  apiBaseUrl: 'http://localhost:8080'
 };

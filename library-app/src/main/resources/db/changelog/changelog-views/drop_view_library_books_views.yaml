@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: drop_view_library_books
+      author: Dmytro Melnyk
+      changes:
+        - dropView:
+            viewName: library_books_view

@@ -7,7 +7,7 @@ import org.example.library.library_book.domain.LibraryBookStatus;
 import org.example.library.library_book.dto.*;
 import org.example.library.library_book.service.LibraryBookService;
 import org.example.library.pagination.PaginationParams;
-import org.example.library.security.UserDetailsImpl;
+import org.example.library.security.UserPrincipal;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,97 +25,97 @@ public class LibraryBookController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public Page<LibraryBookDto> getAll(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public Page<LibraryBookDto> getAll(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                        PaginationParams paginationParams,
                                        LibraryBookSearchCriteria criteria
     ) {
-        return service.getAllByUserId(userDetails.getId(), criteria, paginationParams);
+        return service.getAllByUserId(userPrincipal.getId(), criteria, paginationParams);
     }
 
     @GetMapping("/languages")
     @ResponseStatus(HttpStatus.OK)
-    public List<LanguageWithCount> getLanguages(@AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return service.getLanguagesByUserId(userDetails.getId());
+    public List<LanguageWithCount> getLanguages(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return service.getLanguagesByUserId(userPrincipal.getId());
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void create(@AuthenticationPrincipal UserDetailsImpl userDetails, @RequestParam Integer bookId) {
-        service.create(bookId, userDetails.user());
+    public void create(@AuthenticationPrincipal UserPrincipal userPrincipal, @RequestParam Integer bookId) {
+        service.create(bookId, userPrincipal.getId());
     }
 
     @PostMapping("/local")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createLocalBook(@AuthenticationPrincipal UserDetailsImpl userDetails, @Valid @RequestBody CreateLocalBookDto dto) {
-        service.createLocalBook(dto, userDetails.user());
+    public void createLocalBook(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody CreateLocalBookDto dto) {
+        service.createLocalBook(dto, userPrincipal.getId());
     }
 
     @PutMapping("/local/{libraryBookId}")
     @ResponseStatus(HttpStatus.OK)
-    public LibraryBookDto updateLocalBook(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public LibraryBookDto updateLocalBook(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                           @PathVariable Integer libraryBookId,
                                           @Valid @RequestBody org.example.library.library_book.dto.UpdateLocalBookDto dto
     ) {
-        return service.updateLocalBook(libraryBookId, dto, userDetails.getId());
+        return service.updateLocalBook(libraryBookId, dto, userPrincipal.getId());
     }
 
     @PostMapping("/bulk")
     @ResponseStatus(HttpStatus.CREATED)
-    public void bulkAdd(@AuthenticationPrincipal UserDetailsImpl userDetails, @Valid @RequestBody BulkRequest request) {
-        service.bulkAdd(request.getIds(), userDetails.user());
+    public void bulkAdd(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody BulkRequest request) {
+        service.bulkAdd(request.getIds(), userPrincipal.getId());
     }
 
     @PutMapping("/{libraryBookId}/rating")
     @ResponseStatus(HttpStatus.OK)
-    public LibraryBookDto rate(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public LibraryBookDto rate(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                @PathVariable Integer libraryBookId,
                                @RequestParam Integer rating
     ) {
-        return service.rate(libraryBookId, userDetails.getId(), rating);
+        return service.rate(libraryBookId, userPrincipal.getId(), rating);
     }
 
     @PutMapping("/{libraryBookId}/status")
     @ResponseStatus(HttpStatus.OK)
-    public LibraryBookDto updateStatus(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public LibraryBookDto updateStatus(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                        @PathVariable Integer libraryBookId,
                                        @RequestParam LibraryBookStatus status
     ) {
-        return service.updateStatus(libraryBookId, userDetails.getId(), status);
+        return service.updateStatus(libraryBookId, userPrincipal.getId(), status);
     }
 
     @PutMapping("/bulk-status")
     @ResponseStatus(HttpStatus.OK)
-    public void bulkUpdateStatus(@AuthenticationPrincipal UserDetailsImpl userDetails, @Valid @RequestBody BulkStatusUpdateRequest request) {
-        service.bulkUpdateStatus(request.getIds(), userDetails.getId(), request.getStatus());
+    public void bulkUpdateStatus(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody BulkStatusUpdateRequest request) {
+        service.bulkUpdateStatus(request.getIds(), userPrincipal.getId(), request.getStatus());
     }
 
     @PutMapping("/{libraryBookId}/details")
     @ResponseStatus(HttpStatus.OK)
-    public LibraryBookDto updateDetails(@AuthenticationPrincipal UserDetailsImpl userDetails,
-                                         @PathVariable Integer libraryBookId,
-                                         @Valid @RequestBody UpdateLibraryBookDetailsDto dto
+    public LibraryBookDto updateDetails(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                        @PathVariable Integer libraryBookId,
+                                        @Valid @RequestBody UpdateLibraryBookDetailsDto dto
     ) {
-        return service.updateDetails(libraryBookId, userDetails.getId(), dto);
+        return service.updateDetails(libraryBookId, userPrincipal.getId(), dto);
     }
 
     @PutMapping("/{libraryBookId}/details/reset")
     @ResponseStatus(HttpStatus.OK)
-    public LibraryBookDto resetDetails(@AuthenticationPrincipal UserDetailsImpl userDetails,
+    public LibraryBookDto resetDetails(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                        @PathVariable Integer libraryBookId
     ) {
-        return service.resetDetails(libraryBookId, userDetails.getId());
+        return service.resetDetails(libraryBookId, userPrincipal.getId());
     }
 
     @DeleteMapping("/{libraryBookId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@AuthenticationPrincipal UserDetailsImpl userDetails, @PathVariable Integer libraryBookId) {
-        service.delete(libraryBookId, userDetails.getId());
+    public void delete(@AuthenticationPrincipal UserPrincipal userPrincipal, @PathVariable Integer libraryBookId) {
+        service.delete(libraryBookId, userPrincipal.getId());
     }
 
     @PostMapping("/bulk-remove")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void bulkDelete(@AuthenticationPrincipal UserDetailsImpl userDetails, @Valid @RequestBody BulkRequest request) {
-        service.bulkDelete(request.getIds(), userDetails.getId());
+    public void bulkDelete(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody BulkRequest request) {
+        service.bulkDelete(request.getIds(), userPrincipal.getId());
     }
 
 }

@@ -56,7 +56,8 @@
     },
     "success": {
       "saved": "Успішно збережено",
-      "deleted": "Успішно видалено"
+      "deleted": "Успішно видалено",
+      "logout": "Вихід успішний"
     }
   },
   "dialogs": {
@@ -213,6 +214,10 @@
     "title": "Колекції",
     "expandAll": "Розгорнути всі",
     "collapseAll": "Згорнути всі",
+    "expandBranch": "Розгорнути гілку",
+    "collapseBranch": "Згорнути гілку",
+    "expandCollection": "Розгорнути колекцію",
+    "collapseCollection": "Згорнути колекцію",
     "createCollection": "Створити колекцію",
     "goToCollection": "Перейти до колекції",
     "addBook": "Додати книгу",

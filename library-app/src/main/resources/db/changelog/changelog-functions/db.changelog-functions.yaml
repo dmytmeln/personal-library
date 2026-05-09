@@ -1,3 +1,0 @@
-databaseChangeLog:
-  - include:
-      file: db/changelog/changelog-functions/changeset/create_function_get_collection_subtree_ids.yaml

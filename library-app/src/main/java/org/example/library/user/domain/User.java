@@ -1,18 +1,21 @@
 package org.example.library.user.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.example.library.security.jwt.RefreshToken;
+import org.example.library.security.jwt.RefreshToken_;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name = "users")
 @Getter
 @Setter
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class User {
 
     @Id
@@ -32,7 +35,12 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private Role role;
+    @Builder.Default
+    private Role role = Role.USER;
+
+    @OneToMany(mappedBy = RefreshToken_.USER)
+    @Builder.Default
+    private List<RefreshToken> refreshTokens = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {

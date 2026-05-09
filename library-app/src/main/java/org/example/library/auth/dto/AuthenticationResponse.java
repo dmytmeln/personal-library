@@ -1,5 +1,6 @@
 package org.example.library.auth.dto;
 
-public record AuthenticationResponse(String token) {
+import org.example.library.user.dto.UserResponse;
 
+public record AuthenticationResponse(TokenResponse tokenResponse, UserResponse userResponse) {
 }
