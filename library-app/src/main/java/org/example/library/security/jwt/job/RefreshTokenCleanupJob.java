@@ -2,7 +2,7 @@ package org.example.library.security.jwt.job;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.library.security.jwt.RefreshTokenRepository;
+import org.example.library.auth.repository.RefreshTokenRepository;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 

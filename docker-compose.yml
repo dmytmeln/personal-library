@@ -12,29 +12,6 @@ services:
     volumes:
       - library-data:/var/lib/postgresql/data
 
-  loki:
-    image: grafana/loki:2.9.1
-    ports:
-      - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
-
-  prometheus:
-    image: prom/prometheus:latest
-    ports:
-      - "9090:9090"
-    volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
-
-  grafana:
-    image: grafana/grafana:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-    depends_on:
-      - loki
-      - prometheus
-
 
 volumes:
   library-data:

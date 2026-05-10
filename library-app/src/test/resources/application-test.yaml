@@ -6,6 +6,7 @@ spring:
       ddl-auto: validate
   liquibase:
     enabled: true
+    contexts: test
 
 app:
   recommendations:
@@ -14,4 +15,4 @@ app:
 application:
   security:
     jwt:
-      secret-key: "very-long-and-secure-test-secret-key-for-jwt-generation-32-chars"
+      secret-key: "dmVyeS1sb25nLWFuZC1zZWN1cmUtdGVzdC1zZWNyZXQta2V5LWZvci1qd3QtZ2VuZXJhdGlvbi0zMi1jaGFycw=="

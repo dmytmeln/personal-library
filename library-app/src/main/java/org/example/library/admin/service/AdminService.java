@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -92,6 +93,7 @@ public class AdminService {
     public void createBook(AdminBookDto dto) {
         var book = new Book();
         updateBookFields(book, dto);
+
         var savedBook = bookRepository.save(book);
         log.info("[ADMIN_BOOK_CREATE] Book ID: {}", savedBook.getId());
     }
@@ -101,6 +103,7 @@ public class AdminService {
         var book = bookRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("error.book.not_found"));
         updateBookFields(book, dto);
+
         bookRepository.save(book);
         log.info("[ADMIN_BOOK_UPDATE] Book ID: {}", id);
     }
@@ -125,6 +128,7 @@ public class AdminService {
         var author = new Author();
         author.setPopularityCount(0);
         updateAuthorFields(author, dto);
+
         var savedAuthor = authorRepository.save(author);
         log.info("[ADMIN_AUTHOR_CREATE] Author ID: {}", savedAuthor.getId());
     }
@@ -134,6 +138,7 @@ public class AdminService {
         var author = authorRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("error.author.not_found"));
         updateAuthorFields(author, dto);
+
         authorRepository.save(author);
         log.info("[ADMIN_AUTHOR_UPDATE] Author ID: {}", id);
     }
@@ -157,6 +162,7 @@ public class AdminService {
                 throw new BadRequestException("error.author.has_books");
             }
         }
+
         authorRepository.deleteAllById(ids);
         log.info("[ADMIN_AUTHORS_BULK_DELETE] Count: {}", ids.size());
     }
@@ -166,6 +172,7 @@ public class AdminService {
         var category = new Category();
         category.setPopularityCount(0);
         updateCategoryFields(category, dto);
+
         var savedCategory = categoryRepository.save(category);
         log.info("[ADMIN_CATEGORY_CREATE] Category ID: {}", savedCategory.getId());
     }
@@ -175,6 +182,7 @@ public class AdminService {
         var category = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("error.category.not_found"));
         updateCategoryFields(category, dto);
+
         categoryRepository.save(category);
         log.info("[ADMIN_CATEGORY_UPDATE] Category ID: {}", id);
     }
@@ -192,12 +200,13 @@ public class AdminService {
     }
 
     @Transactional
-    public void deleteCategories(java.util.List<Integer> ids) {
+    public void deleteCategories(List<Integer> ids) {
         for (Integer id : ids) {
             if (bookRepository.existsByCategoryId(id)) {
                 throw new BadRequestException("error.category.has_books");
             }
         }
+
         categoryRepository.deleteAllById(ids);
         log.info("[ADMIN_CATEGORIES_BULK_DELETE] Count: {}", ids.size());
     }
@@ -224,6 +233,7 @@ public class AdminService {
             if (book.getTranslations() == null) {
                 book.setTranslations(new HashMap<>());
             }
+
             var existingTranslations = book.getTranslations();
             for (var entry : dto.getTranslations().entrySet()) {
                 var lang = entry.getKey();
@@ -254,6 +264,7 @@ public class AdminService {
             if (author.getTranslations() == null) {
                 author.setTranslations(new HashMap<>());
             }
+
             var existingTranslations = author.getTranslations();
             for (var entry : dto.getTranslations().entrySet()) {
                 var lang = entry.getKey();
@@ -281,6 +292,7 @@ public class AdminService {
             if (category.getTranslations() == null) {
                 category.setTranslations(new HashMap<>());
             }
+
             var existingTranslations = category.getTranslations();
             for (var entry : dto.getTranslations().entrySet()) {
                 var lang = entry.getKey();

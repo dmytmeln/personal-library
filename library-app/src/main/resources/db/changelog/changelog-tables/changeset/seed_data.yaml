@@ -2,6 +2,7 @@ databaseChangeLog:
   - changeSet:
       id: seed_categories
       author: Dmytro Melnyk
+      context: "!test"
       changes:
         - loadData:
             tableName: categories
@@ -14,6 +15,7 @@ databaseChangeLog:
   - changeSet:
       id: seed_category_translations
       author: Dmytro Melnyk
+      context: "!test"
       changes:
         - loadData:
             tableName: category_translations
@@ -36,6 +38,7 @@ databaseChangeLog:
   - changeSet:
       id: seed_authors
       author: Dmytro Melnyk
+      context: "!test"
       changes:
         - loadData:
             tableName: authors
@@ -54,6 +57,7 @@ databaseChangeLog:
   - changeSet:
       id: seed_author_translations
       author: Dmytro Melnyk
+      context: "!test"
       changes:
         - loadData:
             tableName: author_translations
@@ -79,6 +83,7 @@ databaseChangeLog:
   - changeSet:
       id: seed_books
       author: Dmytro Melnyk
+      context: "!test"
       changes:
         - loadData:
             tableName: books
@@ -103,6 +108,7 @@ databaseChangeLog:
   - changeSet:
       id: seed_book_translations
       author: Dmytro Melnyk
+      context: "!test"
       changes:
         - loadData:
             tableName: book_translations
@@ -128,6 +134,7 @@ databaseChangeLog:
   - changeSet:
       id: seed_book_authors
       author: Dmytro Melnyk
+      context: "!test"
       changes:
         - loadData:
             tableName: book_authors

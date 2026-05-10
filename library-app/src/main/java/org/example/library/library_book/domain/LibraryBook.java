@@ -30,7 +30,7 @@ public class LibraryBook {
     @Builder.Default
     private LibraryBookStatus status = LibraryBookStatus.NO_TAG;
 
-    @Column(name = "added_at", nullable = false)
+    @Column(name = "added_at", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime addedAt;
 

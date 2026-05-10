@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.library.auth.dto.AuthenticationRequest;
 import org.example.library.auth.dto.UserRegisterRequest;
 import org.example.library.auth.service.AuthService;
-import org.example.library.security.jwt.RefreshTokenService;
+import org.example.library.auth.service.RefreshTokenService;
 import org.example.library.security.util.CookieUtils;
 import org.example.library.user.dto.UserResponse;
 import org.example.library.user.service.UserService;

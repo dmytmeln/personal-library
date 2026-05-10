@@ -1,7 +1,6 @@
 package org.example.library.author.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.library.author.domain.Author;
 import org.example.library.author.dto.AuthorDto;
 import org.example.library.author.dto.AuthorSearchParams;
 import org.example.library.author.dto.AuthorWithBooksCount;
@@ -28,6 +27,7 @@ public class AuthorService {
     private final AuthorMapper mapper;
     private final PageRequestBuilder pageRequestBuilder;
 
+
     public Page<AuthorWithBooksCount> search(PaginationParams paginationParams, AuthorSearchParams searchParams) {
         var pageable = pageRequestBuilder.buildPageRequest(paginationParams, SortableFields.AUTHOR_FIELDS);
         var lang = LocaleContextHolder.getLocale().getLanguage();
@@ -39,19 +39,13 @@ public class AuthorService {
                 searchParams.getBooksCountMin(),
                 searchParams.getBooksCountMax(),
                 lang,
-                pageable
-        );
+                pageable);
     }
 
     public AuthorDto getById(Integer authorId) {
         var lang = LocaleContextHolder.getLocale().getLanguage();
         return displayViewRepository.findByIdAndLanguageCode(authorId, lang)
                 .map(mapper::toDto)
-                .orElseThrow(() -> new NotFoundException("error.author.not_found"));
-    }
-
-    public Author getExistingById(Integer authorId) {
-        return repository.findById(authorId)
                 .orElseThrow(() -> new NotFoundException("error.author.not_found"));
     }
 
@@ -72,8 +66,7 @@ public class AuthorService {
                 searchParams.getBooksCountMin(),
                 searchParams.getBooksCountMax(),
                 lang,
-                pageable
-        );
+                pageable);
     }
 
     public List<CountryWithCount> getCountriesForUser(Integer userId) {

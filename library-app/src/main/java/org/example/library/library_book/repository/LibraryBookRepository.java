@@ -70,4 +70,6 @@ public interface LibraryBookRepository extends JpaRepository<LibraryBook, Intege
     @Query("SELECT lb FROM LibraryBook lb JOIN FETCH lb.book WHERE lb.id IN :ids AND lb.user.id = :userId")
     List<LibraryBook> findAllByIdInAndUserIdWithBook(List<Integer> ids, Integer userId);
 
+    List<LibraryBook> findAllByUserId(Integer userId);
+
 }

@@ -1,10 +1,13 @@
 package org.example.library.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+@Getter
 @ResponseStatus(HttpStatus.BAD_REQUEST)
 public class InvalidSortParameterException extends RuntimeException {
+
     private final Object[] args;
 
     public InvalidSortParameterException(String message) {
@@ -17,7 +20,4 @@ public class InvalidSortParameterException extends RuntimeException {
         this.args = args;
     }
 
-    public Object[] getArgs() {
-        return args;
-    }
 }
