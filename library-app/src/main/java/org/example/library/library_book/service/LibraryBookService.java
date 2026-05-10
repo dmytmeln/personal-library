@@ -14,7 +14,11 @@ import org.example.library.exception.NotFoundException;
 import org.example.library.library_book.domain.LibraryBook;
 import org.example.library.library_book.domain.LibraryBookStatus;
 import org.example.library.library_book.domain.LibraryBookView;
-import org.example.library.library_book.dto.*;
+import org.example.library.library_book.dto.CreateLocalBookDto;
+import org.example.library.library_book.dto.LibraryBookDto;
+import org.example.library.library_book.dto.LibraryBookSearchCriteria;
+import org.example.library.library_book.dto.UpdateLibraryBookDetailsDto;
+import org.example.library.library_book.dto.UpdateLocalBookDto;
 import org.example.library.library_book.mapper.LibraryBookMapper;
 import org.example.library.library_book.repository.LibraryBookRepository;
 import org.example.library.library_book.repository.LibraryBookViewRepository;
@@ -22,7 +26,7 @@ import org.example.library.library_book.repository.LibraryBookViewSpecification;
 import org.example.library.pagination.PageRequestBuilder;
 import org.example.library.pagination.PaginationParams;
 import org.example.library.pagination.SortableFields;
-import org.example.library.recommendations.event.UserProfileUpdatedEvent;
+import org.example.library.recommendation.event.UserProfileUpdatedEvent;
 import org.example.library.user.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -119,17 +123,18 @@ public class LibraryBookService {
             incrementPopularity(List.of(bookId));
             eventPublisher.publishEvent(new UserProfileUpdatedEvent(userId));
         }
+
         log.info("[LIBRARY_BOOK_ADD] User ID: {}, Book ID: {}", userId, bookId);
     }
 
     @Transactional
     public void bulkAdd(List<Integer> bookIds, Integer userId) {
         var existingIds = repository.findExistingBookIdsInLibrary(userId, bookIds);
+
         var newBookIds = bookIds.stream()
                 .filter(id -> !existingIds.contains(id))
                 .distinct()
                 .toList();
-
         if (newBookIds.isEmpty()) return;
 
         var books = bookRepository.findAllById(newBookIds);
@@ -139,24 +144,22 @@ public class LibraryBookService {
         var accessibleBooks = books.stream()
                 .filter(b -> b.getOwner() == null || b.getOwner().getId().equals(userId))
                 .toList();
-
         if (accessibleBooks.isEmpty()) return;
 
         var libraryBooks = accessibleBooks.stream()
                 .map(book -> LibraryBook.of(book, userRepository.getReferenceById(userId)))
                 .toList();
-
         repository.saveAll(libraryBooks);
 
         var globalBookIds = accessibleBooks.stream()
                 .filter(b -> b.getOwner() == null)
                 .map(Book::getId)
                 .toList();
-
         if (!globalBookIds.isEmpty()) {
             incrementPopularity(globalBookIds);
             eventPublisher.publishEvent(new UserProfileUpdatedEvent(userId));
         }
+
         log.info("[LIBRARY_BOOK_BULK_ADD] User ID: {}, Accessible Book IDs: {}", userId, accessibleBooks.stream().map(Book::getId).toList());
     }
 
@@ -171,8 +174,10 @@ public class LibraryBookService {
 
         repository.flush();
         eventPublisher.publishEvent(new UserProfileUpdatedEvent(userId));
+
         var view = getViewById(libraryBookId);
         log.info("[LIBRARY_BOOK_RATE] User ID: {}, Library Book ID: {}, Rating: {}", userId, libraryBookId, rating);
+
         return mapper.toDto(view);
     }
 
@@ -183,8 +188,10 @@ public class LibraryBookService {
         repository.saveAndFlush(libraryBook);
 
         eventPublisher.publishEvent(new UserProfileUpdatedEvent(userId));
+
         var view = getViewById(libraryBookId);
         log.info("[LIBRARY_BOOK_STATUS_UPDATE] User ID: {}, Library Book ID: {}, Status: {}", userId, libraryBookId, status);
+
         return mapper.toDto(view);
     }
 
@@ -195,6 +202,7 @@ public class LibraryBookService {
 
         libraryBooks.forEach(lb -> updateBookStatus(lb, status));
         repository.saveAll(libraryBooks);
+
         eventPublisher.publishEvent(new UserProfileUpdatedEvent(userId));
         log.info("[LIBRARY_BOOK_BULK_STATUS_UPDATE] User ID: {}, Library Book IDs: {}, Status: {}", userId, libraryBookIds, status);
     }

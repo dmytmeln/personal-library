@@ -7,7 +7,7 @@ import org.example.library.auth.dto.TokenResponse;
 import org.example.library.auth.dto.UserRegisterRequest;
 import org.example.library.exception.BadRequestException;
 import org.example.library.exception.NotFoundException;
-import org.example.library.security.jwt.RefreshTokenService;
+import org.example.library.auth.service.RefreshTokenService;
 import org.example.library.user.dto.UpdateProfileRequest;
 import org.example.library.user.dto.UserResponse;
 import org.example.library.user.mapper.UserMapper;
@@ -26,6 +26,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper mapper;
 
+
     public UserResponse register(UserRegisterRequest request) {
         if (repository.existsByEmail(request.getEmail()))
             throw new BadRequestException("error.auth.email_already_registered");
@@ -35,6 +36,7 @@ public class UserService {
 
         var savedUser = repository.save(user);
         log.info("[REGISTER_SUCCESS] User: {}", savedUser.getEmail());
+
         return mapper.toResponse(savedUser);
     }
 

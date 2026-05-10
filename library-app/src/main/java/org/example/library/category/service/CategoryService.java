@@ -24,6 +24,7 @@ public class CategoryService {
     private final CategoryMapper mapper;
     private final PageRequestBuilder pageRequestBuilder;
 
+
     public Page<CategoryWithBooksCount> search(PaginationParams paginationParams, CategorySearchParams searchParams) {
         var pageable = pageRequestBuilder.buildPageRequest(paginationParams, SortableFields.CATEGORY_FIELDS);
         var lang = LocaleContextHolder.getLocale().getLanguage();
@@ -32,8 +33,7 @@ public class CategoryService {
                 searchParams.getBooksCountMin(),
                 searchParams.getBooksCountMax(),
                 lang,
-                pageable
-        );
+                pageable);
     }
 
     public CategoryDto getById(Integer categoryId) {
@@ -52,8 +52,7 @@ public class CategoryService {
                 searchParams.getBooksCountMin(),
                 searchParams.getBooksCountMax(),
                 lang,
-                pageable
-        );
+                pageable);
     }
 
 }

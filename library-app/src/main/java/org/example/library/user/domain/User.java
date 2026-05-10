@@ -2,8 +2,8 @@ package org.example.library.user.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.example.library.security.jwt.RefreshToken;
-import org.example.library.security.jwt.RefreshToken_;
+import org.example.library.auth.domain.RefreshToken;
+import org.example.library.auth.domain.RefreshToken_;
 
 import java.util.ArrayList;
 import java.util.List;

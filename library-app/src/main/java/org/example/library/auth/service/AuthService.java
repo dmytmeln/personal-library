@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.library.auth.dto.AuthenticationRequest;
 import org.example.library.auth.dto.AuthenticationResponse;
 import org.example.library.security.UserDetailsImpl;
-import org.example.library.security.jwt.RefreshTokenService;
 import org.example.library.user.mapper.UserMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

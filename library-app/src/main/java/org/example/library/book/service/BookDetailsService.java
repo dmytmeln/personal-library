@@ -13,6 +13,8 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class BookDetailsService {
@@ -34,8 +36,8 @@ public class BookDetailsService {
 
         var builder = BookDetails.builder()
                 .collections(collections)
-                .averageRating(ratingSummary.getAverageRating() != null ? ratingSummary.getAverageRating() : 0.0)
-                .ratingsNumber(ratingSummary.getRatingsCount() != null ? ratingSummary.getRatingsCount() : 0L);
+                .averageRating(Optional.ofNullable(ratingSummary.getAverageRating()).orElse(0.0))
+                .ratingsNumber(Optional.ofNullable(ratingSummary.getRatingsCount()).orElse(0L));
 
         if (libraryBookViewOpt.isPresent()) {
             builder.libraryBook(libraryBookMapper.toDto(libraryBookViewOpt.get()));
