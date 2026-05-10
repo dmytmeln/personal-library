@@ -9,6 +9,9 @@ spring:
         generate_statistics: true
         show_sql: true
         format_sql: true
+  liquibase:
+    contexts: dev
+
 
 logging:
   level:

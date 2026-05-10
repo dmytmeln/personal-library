@@ -67,3 +67,5 @@ databaseChangeLog:
       file: db/changelog/changelog-indexes/changeset/create_index_refresh_tokens.yaml
   - include:
       file: db/changelog/changelog-tables/changeset/seed_data.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/seed_user.yaml
