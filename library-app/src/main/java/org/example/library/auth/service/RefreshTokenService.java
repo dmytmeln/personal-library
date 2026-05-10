@@ -1,6 +1,7 @@
 package org.example.library.auth.service;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.example.library.auth.dto.TokenResponse;
 import org.example.library.security.jwt.JwtService;
 import org.example.library.auth.domain.RefreshToken;
@@ -9,12 +10,11 @@ import org.example.library.user.domain.User;
 import org.example.library.user.mapper.UserMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.DigestUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.time.Instant;
 
 @Service
@@ -23,7 +23,6 @@ public class RefreshTokenService {
 
     private final RefreshTokenRepository repository;
     private final JwtService jwtService;
-    private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
     @Value("${application.security.jwt.refresh-expiration}")
@@ -41,8 +40,7 @@ public class RefreshTokenService {
         var refreshToken = repository.findById(tokenId)
                 .orElseThrow(() -> new BadCredentialsException("Unknown token"));
 
-        var preHashed = DigestUtils.md5DigestAsHex(rawToken.getBytes(StandardCharsets.UTF_8));
-        if (refreshToken.isExpired() || !passwordEncoder.matches(preHashed, refreshToken.getRefreshTokenHash())) {
+        if (refreshToken.isExpired() || !isTokenHashValid(rawToken, refreshToken.getRefreshTokenHash())) {
             throw new BadCredentialsException("Invalid token");
         }
 
@@ -74,13 +72,20 @@ public class RefreshTokenService {
 
         var refreshToken = new RefreshToken();
         refreshToken.setUser(user);
-        var preHashed = DigestUtils.md5DigestAsHex(rawRefreshToken.getBytes(StandardCharsets.UTF_8));
-        refreshToken.setRefreshTokenHash(passwordEncoder.encode(preHashed));
+        var refreshTokenHash = DigestUtils.sha256Hex(rawRefreshToken.getBytes(StandardCharsets.UTF_8));
+        refreshToken.setRefreshTokenHash(refreshTokenHash);
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenExpiration));
         refreshToken.setRevoked(false);
         repository.save(refreshToken);
 
         return new TokenResponse(accessToken, rawRefreshToken, refreshToken.getId());
+    }
+
+    private boolean isTokenHashValid(String rawToken, String storedHash) {
+        var rawTokenHash = DigestUtils.sha256Hex(rawToken.getBytes(StandardCharsets.UTF_8));
+        return MessageDigest.isEqual(
+                rawTokenHash.getBytes(StandardCharsets.UTF_8),
+                storedHash.getBytes(StandardCharsets.UTF_8));
     }
 
 }
