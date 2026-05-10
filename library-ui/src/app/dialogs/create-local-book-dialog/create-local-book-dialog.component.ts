@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit, signal} from '@angular/core';
+import {Component, Inject, signal} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {MAT_DIALOG_DATA, MatDialogModule, MatDialogRef} from '@angular/material/dialog';
@@ -42,7 +42,7 @@ export interface CreateLocalBookDialogData {
   templateUrl: './create-local-book-dialog.component.html',
   styleUrl: './create-local-book-dialog.component.scss'
 })
-export class CreateLocalBookDialogComponent implements OnInit {
+export class CreateLocalBookDialogComponent {
   form: FormGroup;
   readonly statuses = LIBRARY_BOOK_STATUSES;
 
@@ -105,9 +105,6 @@ export class CreateLocalBookDialogComponent implements OnInit {
       } as unknown as Author));
       this.selectedAuthors.set(authorsList);
     }
-  }
-
-  ngOnInit(): void {
   }
 
   onCategorySearch(query: string): void {

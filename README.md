@@ -1,5 +1,10 @@
 # Personal-Library
 
+![Backend Build](https://github.com/dmytmeln/personal-library/actions/workflows/spring-boot_deploy.yml/badge.svg)
+![Frontend Build](https://github.com/dmytmeln/personal-library/actions/workflows/angular_deploy.yml/badge.svg)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=dmytmeln_personal-library&metric=coverage)](https://sonarcloud.io/summary/overall?id=dmytmeln_personal-library)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=dmytmeln_personal-library&metric=alert_status)](https://sonarcloud.io/summary/overall?id=dmytmeln_personal-library)
+
 
 ## Requirements
 
