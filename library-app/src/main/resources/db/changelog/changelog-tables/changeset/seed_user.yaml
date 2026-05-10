@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: seed_test_user
+      author: Dmytro Melnyk
+      context: dev AND !test
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: nextval('users_seq')
+              - column:
+                  name: email
+                  value: admin@example.com
+              - column:
+                  name: full_name
+                  value: Admin User
+              - column:
+                  name: password
+                  value: "$2a$10$3LlY3WWxaxo8k43SSiN8SuC43T4Mj1zqS.k6kcA6KO.hav5MprlKO"
+              - column:
+                  name: role
+                  value: ADMIN
+
+  - changeSet:
+      id: seed_test_user_regular
+      author: Dmytro Melnyk
+      context: dev AND !test
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: nextval('users_seq')
+              - column:
+                  name: email
+                  value: user@example.com
+              - column:
+                  name: full_name
+                  value: Regular User
+              - column:
+                  name: password
+                  value: "$2a$10$3LlY3WWxaxo8k43SSiN8SuC43T4Mj1zqS.k6kcA6KO.hav5MprlKO"
+              - column:
+                  name: role
+                  value: USER
