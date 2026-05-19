@@ -20,7 +20,7 @@ public class Author {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "authors_seq")
-    @SequenceGenerator(name = "authors_seq", sequenceName = "authors_seq", allocationSize = 20, initialValue = 20) //todo: change initialValue to 1 after testing
+    @SequenceGenerator(name = "authors_seq", sequenceName = "authors_seq", allocationSize = 20, initialValue = 20)
     @Column(name = "author_id")
     private Integer id;
 
@@ -49,6 +49,10 @@ public class Author {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public AuthorTranslation getDefaultTranslation() {
+        return translations.get("en");
     }
 
 }

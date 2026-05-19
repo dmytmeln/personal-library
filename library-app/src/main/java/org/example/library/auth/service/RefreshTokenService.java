@@ -29,13 +29,13 @@ public class RefreshTokenService {
     private long refreshTokenExpiration;
 
 
-    @Transactional
+    @Transactional(noRollbackFor = SecurityException.class)
     public TokenResponse refreshToken(String rawToken, Integer tokenId) {
         var refreshToken = invalidateToken(rawToken, tokenId);
         return generateNewTokens(refreshToken.getUser());
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = SecurityException.class)
     public RefreshToken invalidateToken(String rawToken, Integer tokenId) {
         var refreshToken = repository.findById(tokenId)
                 .orElseThrow(() -> new BadCredentialsException("Unknown token"));

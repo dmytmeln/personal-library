@@ -1,7 +1,0 @@
-databaseChangeLog:
-  - changeSet:
-      id: create_index_books_description_vector_hnsw
-      author: Dmytro Melnyk
-      changes:
-        - sql:
-            sql: CREATE INDEX idx_books_description_vector_hnsw ON books USING hnsw (description_vector vector_cosine_ops);

@@ -62,13 +62,16 @@ public interface LibraryBookRepository extends JpaRepository<LibraryBook, Intege
 
     boolean existsByBookIdAndUserId(Integer bookId, Integer userId);
 
-    @Query("SELECT lb FROM LibraryBook lb JOIN lb.book b WHERE lb.user.id = :userId")
+    @Query("SELECT lb FROM LibraryBook lb JOIN FETCH lb.book b WHERE lb.user.id = :userId AND b.embedding IS NOT NULL")
     List<LibraryBook> findAllWithVectorsByUserId(Integer userId);
 
     List<LibraryBook> findAllByIdInAndUserId(List<Integer> ids, Integer userId);
 
     @Query("SELECT lb FROM LibraryBook lb JOIN FETCH lb.book WHERE lb.id IN :ids AND lb.user.id = :userId")
     List<LibraryBook> findAllByIdInAndUserIdWithBook(List<Integer> ids, Integer userId);
+
+    @Query("SELECT lb FROM LibraryBook lb JOIN FETCH lb.book b LEFT JOIN FETCH b.owner WHERE lb.user.id = :userId")
+    List<LibraryBook> findAllByUserIdWithBook(Integer userId);
 
     List<LibraryBook> findAllByUserId(Integer userId);
 

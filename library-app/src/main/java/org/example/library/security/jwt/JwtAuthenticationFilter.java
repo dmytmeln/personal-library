@@ -35,14 +35,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (jwtToken.isPresent()) {
             log.debug("[JWT] Token extracted from cookie for request: {}", request.getRequestURI());
-            setSecurityContext(JwtTokenAuthentication.unauthenticated(jwtToken.get()));
+            authenticateUser(JwtTokenAuthentication.unauthenticated(jwtToken.get()));
         } else {
             log.debug("[JWT] No accessToken found in request: {}", request.getRequestURI());
         }
         filterChain.doFilter(request, response);
     }
 
-    private void setSecurityContext(JwtTokenAuthentication auth) {
+    private void authenticateUser(JwtTokenAuthentication auth) {
         SecurityContext context = SecurityContextHolder.createEmptyContext();
         context.setAuthentication(authenticationManager.authenticate(auth));
         SecurityContextHolder.setContext(context);

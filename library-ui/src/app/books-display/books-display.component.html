@@ -12,18 +12,18 @@
           [book]="getBook(item)"
           [actionsMenu]="actionsMenu()"
           [menuData]="getMenuData(item)"
-          [isSelected]="selectionStore()?.isSelected(getBook(item).id) ?? false"
+          [isSelected]="selectionStore()?.isSelected(item.id) ?? false"
           [selectionMode]="selectionStore()?.isSelectionMode() ?? false"
-          (toggleSelection)="selectionStore()?.toggle(getBook(item).id)"
+          (toggleSelection)="selectionStore()?.toggle(item.id)"
           [adminMode]="adminMode()"/>
       } @else {
         <app-book-list-item
           [book]="getBook(item)"
           [actionsMenu]="actionsMenu()"
           [menuData]="getMenuData(item)"
-          [isSelected]="selectionStore()?.isSelected(getBook(item).id) ?? false"
+          [isSelected]="selectionStore()?.isSelected(item.id) ?? false"
           [selectionMode]="selectionStore()?.isSelectionMode() ?? false"
-          (toggleSelection)="selectionStore()?.toggle(getBook(item).id)"
+          (toggleSelection)="selectionStore()?.toggle(item.id)"
           [adminMode]="adminMode()"/>
       }
     }

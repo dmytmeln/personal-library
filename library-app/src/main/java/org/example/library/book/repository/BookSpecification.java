@@ -53,7 +53,11 @@ public class BookSpecification {
             if (title == null || title.isBlank())
                 return null;
 
-            return cb.like(cb.lower(root.get(BookDisplayView_.TITLE)), "%" + title.toLowerCase() + "%");
+            var lowerTitle = title.toLowerCase();
+            return cb.or(
+                    cb.like(cb.lower(root.get(BookDisplayView_.TITLE)), "%" + lowerTitle + "%"),
+                    cb.greaterThan(cb.function("similarity", Double.class, root.get(BookDisplayView_.TITLE), cb.literal(title)), 0.3)
+            );
         };
     }
 

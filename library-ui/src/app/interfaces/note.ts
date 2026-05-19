@@ -9,3 +9,10 @@ export interface NoteRequest {
   libraryBookId: number;
   content: string;
 }
+
+export interface VoiceNoteResponse {
+  noteId: number;
+  rawTranscript: string;
+  formattedNote: string;
+  createdAt: string;
+}

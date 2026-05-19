@@ -3,7 +3,7 @@ package org.example.library.collection.dto;
 
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import org.example.library.validation.AtLeastOneNotNull;
+import org.example.library.common.validation.AtLeastOneNotNull;
 
 @Data
 @AtLeastOneNotNull(fieldNames = {"name", "description"})

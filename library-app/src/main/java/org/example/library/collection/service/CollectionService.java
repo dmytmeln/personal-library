@@ -11,8 +11,8 @@ import org.example.library.collection.repository.CollectionSpecification;
 import org.example.library.collection_book.domain.CollectionBook;
 import org.example.library.collection_book.domain.CollectionBookId;
 import org.example.library.collection_book.repository.CollectionBookRepository;
-import org.example.library.exception.BadRequestException;
-import org.example.library.exception.NotFoundException;
+import org.example.library.common.exception.BadRequestException;
+import org.example.library.common.exception.NotFoundException;
 import org.example.library.library_book.repository.LibraryBookRepository;
 import org.example.library.user.repository.UserRepository;
 import org.springframework.data.jpa.domain.Specification;
@@ -118,7 +118,6 @@ public class CollectionService {
 
     @Transactional
     public void moveCollection(Integer collectionId, Integer newParentId, Integer userId) {
-        // todo divide into move and makeRoot operations
         if (Objects.equals(collectionId, newParentId))
             throw new BadRequestException("error.collection.cannot_be_own_parent");
 

@@ -44,3 +44,51 @@
 .spacer {
   flex: 1 1 auto;
 }
+
+.recording-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background: var(--mat-sys-surface-container-low);
+  border-radius: 8px;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .duration {
+    text-align: center;
+    font-weight: 500;
+    color: var(--mat-sys-error);
+  }
+
+  .processing-text {
+    text-align: center;
+    font-style: italic;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
+.transcript-section {
+  padding: 16px;
+  background: var(--mat-sys-surface-container-lowest);
+  border-radius: 8px;
+  border-left: 4px solid var(--mat-sys-primary);
+
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .transcript-text {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: var(--mat-sys-on-surface);
+  }
+}

@@ -26,8 +26,8 @@ public interface BookRepository extends JpaRepository<Book, Integer>, JpaSpecifi
             """)
     List<LanguageWithCount> findAllLanguagesWithCount(String lang);
 
-    @Query("SELECT b FROM Book b WHERE b.id = :id AND b.owner IS NULL")
-    Optional<Book> findDescriptionVectorById(Integer id);
+    @Query("SELECT b FROM Book b WHERE b.id = :id AND b.owner IS NULL AND b.embedding IS NOT NULL")
+    Optional<Book> findEmbeddingById(Integer id);
 
     @Override
     @EntityGraph(attributePaths = {"category"}, type = EntityGraph.EntityGraphType.LOAD)
@@ -36,15 +36,12 @@ public interface BookRepository extends JpaRepository<Book, Integer>, JpaSpecifi
     @Query("SELECT COUNT(b) FROM Book b WHERE b.status <> :status AND b.owner IS NULL")
     long countWhereBookStatusNot(BookStatus status);
 
-    @Query("SELECT COUNT(b) FROM Book b WHERE b.owner IS NULL AND (b.vectorVersion < :currentVersion OR b.vectorVersion IS NULL)")
-    long countBooksWithOldVersion(Integer currentVersion);
+    @Query("SELECT COUNT(b) FROM Book b WHERE b.owner IS NULL AND b.embedding IS NULL")
+    long countBooksWithoutEmbedding();
 
-    @Query("SELECT concat(tr.title, ' ', tr.description) FROM Book b JOIN b.translations tr WHERE b.owner IS NULL AND tr.description IS NOT NULL AND tr.languageCode = :lang")
-    List<String> findAllDescriptions(String lang);
-
-    @EntityGraph(attributePaths = {"category"}, type = EntityGraph.EntityGraphType.LOAD)
-    @Query("SELECT b FROM Book b WHERE b.owner IS NULL AND (b.vectorVersion < :targetVersion OR b.vectorVersion IS NULL)")
-    Page<Book> findOutdatedBooks(int targetVersion, Pageable pageable);
+    @EntityGraph(attributePaths = {"category", "translations", "category.translations"}, type = EntityGraph.EntityGraphType.LOAD)
+    @Query("SELECT b FROM Book b WHERE b.owner IS NULL AND b.embedding IS NULL")
+    Page<Book> findBooksWithoutEmbedding(Pageable pageable);
 
     @Modifying
     @Query("UPDATE Book b SET b.popularityCount = b.popularityCount + 1 WHERE b.id IN :ids")

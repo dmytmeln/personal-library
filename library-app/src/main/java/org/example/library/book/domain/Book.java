@@ -24,7 +24,7 @@ public class Book {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "books_seq")
-    @SequenceGenerator(name = "books_seq", sequenceName = "books_seq", allocationSize = 20, initialValue = 56) //todo: change initialValue to 1 after testing
+    @SequenceGenerator(name = "books_seq", sequenceName = "books_seq", allocationSize = 20, initialValue = 56)
     @Column(name = "book_id")
     private Integer id;
 
@@ -45,18 +45,15 @@ public class Book {
     @Column(name = "cover_image_url")
     private String coverImageUrl;
 
-    @Column(name = "description_vector", columnDefinition = "vector(1100)")
+    @Column(name = "embedding", columnDefinition = "vector(384)")
     @JdbcTypeCode(SqlTypes.VECTOR)
-    @Array(length = 1100)
-    private float[] descriptionVector;
+    @Array(length = 384)
+    private float[] embedding;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     @Builder.Default
     private BookStatus status = BookStatus.NEW;
-
-    @Column(name = "vector_version")
-    private Integer vectorVersion;
 
     @Column(name = "popularity_count", nullable = false)
     private Integer popularityCount;
@@ -82,6 +79,10 @@ public class Book {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public BookTranslation getDefaultTranslation() {
+        return translations.get("en");
     }
 
 }

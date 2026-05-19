@@ -90,6 +90,13 @@ export class LibraryBookService {
     return this.apiService.put(`/users/me/library-books/${libraryBookId}/details/reset`, {});
   }
 
+  searchByMood(query: string, status?: LibraryBookStatus | null, limit?: number): Observable<LibraryBook[]> {
+    const params: any = {query};
+    if (status) params.status = status;
+    if (limit) params.limit = limit;
+    return this.apiService.get('/users/me/library-books/search-by-mood', {params});
+  }
+
   private buildParams(options: LibraryBookQueryOptions): LibraryBookQueryOptions {
     const {
       page = 0,

@@ -3,7 +3,7 @@ package org.example.library.library_book.dto;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import org.example.library.validation.AtLeastOneNotNull;
+import org.example.library.common.validation.AtLeastOneNotNull;
 
 @AtLeastOneNotNull(fieldNames = {"title", "publishYear", "pages", "language", "description"})
 @Builder

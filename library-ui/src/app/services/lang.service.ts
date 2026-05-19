@@ -17,4 +17,5 @@ export class LangService {
     const saved = localStorage.getItem('lang') || 'en';
     this.transloco.setActiveLang(saved);
   }
+
 }

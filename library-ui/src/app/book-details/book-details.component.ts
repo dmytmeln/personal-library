@@ -126,7 +126,6 @@ export class BookDetailsComponent implements OnInit {
   }
 
   bulkAddSimilarBooks(): void {
-    // todo duplicate code
     const ids = this.selection.selectedIds();
     this.libraryBookService.bulkAdd(ids).subscribe({
       next: () => {

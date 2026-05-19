@@ -68,7 +68,10 @@ export class AdminDashboardComponent {
 
   onBookDeleted(book: Book): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: {message: this.translocoService.translate('common.confirmDelete')}
+      data: {
+        message: this.translocoService.translate('common.confirmDelete'),
+        confirmLabel: 'common.delete'
+      }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {
@@ -87,7 +90,10 @@ export class AdminDashboardComponent {
 
   onAuthorDeleted(author: Author): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: {message: this.translocoService.translate('common.confirmDelete')}
+      data: {
+        message: this.translocoService.translate('common.confirmDelete'),
+        confirmLabel: 'common.delete'
+      }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {
@@ -106,7 +112,10 @@ export class AdminDashboardComponent {
 
   onCategoryDeleted(category: Category): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: {message: this.translocoService.translate('common.confirmDelete')}
+      data: {
+        message: this.translocoService.translate('common.confirmDelete'),
+        confirmLabel: 'common.delete'
+      }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {
@@ -129,7 +138,10 @@ export class AdminDashboardComponent {
     const ids = list.selection.selectedIds();
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: {message: this.translocoService.translate('common.confirmDeleteBulk', {count: ids.length})}
+      data: {
+        message: this.translocoService.translate('common.confirmDeleteBulk', {count: ids.length}),
+        confirmLabel: 'common.delete'
+      }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {
@@ -152,7 +164,10 @@ export class AdminDashboardComponent {
     const ids = list.selection.selectedIds();
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: {message: this.translocoService.translate('common.confirmDeleteBulk', {count: ids.length})}
+      data: {
+        message: this.translocoService.translate('common.confirmDeleteBulk', {count: ids.length}),
+        confirmLabel: 'common.delete'
+      }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {
@@ -175,7 +190,10 @@ export class AdminDashboardComponent {
     const ids = list.selection.selectedIds();
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: {message: this.translocoService.translate('common.confirmDeleteBulk', {count: ids.length})}
+      data: {
+        message: this.translocoService.translate('common.confirmDeleteBulk', {count: ids.length}),
+        confirmLabel: 'common.delete'
+      }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {

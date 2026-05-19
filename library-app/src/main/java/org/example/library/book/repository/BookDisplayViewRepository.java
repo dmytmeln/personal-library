@@ -27,9 +27,9 @@ public interface BookDisplayViewRepository extends JpaRepository<BookDisplayView
             LEFT JOIN library_books lb ON b.book_id = lb.book_id AND lb.user_id = :userId
             WHERE bt.language_code = :languageCode
               AND b.owner_user_id IS NULL
-              AND b.description_vector IS NOT NULL
+              AND b.embedding IS NOT NULL
               AND lb.library_book_id IS NULL
-            ORDER BY b.description_vector <=> cast(:vector as vector)
+            ORDER BY b.embedding <=> cast(:vector as vector)
             LIMIT :limit
             """, nativeQuery = true)
     List<BookDisplayView> findSimilarBooks(float[] vector, String languageCode, Integer userId, int limit);
@@ -44,7 +44,7 @@ public interface BookDisplayViewRepository extends JpaRepository<BookDisplayView
             LEFT JOIN library_books lb ON b.book_id = lb.book_id AND lb.user_id = :userId
             WHERE bt.language_code = :languageCode
               AND b.owner_user_id IS NULL
-              AND b.description_vector IS NOT NULL
+              AND b.embedding IS NOT NULL
               AND lb.library_book_id IS NULL
               AND b.book_id <> :excludeBookId
             ORDER BY
@@ -55,7 +55,7 @@ public interface BookDisplayViewRepository extends JpaRepository<BookDisplayView
                         SELECT author_id FROM book_authors WHERE book_id = :excludeBookId
                     )
                 )) DESC,
-                b.description_vector <=> cast(:vector as vector)
+                b.embedding <=> cast(:vector as vector)
             LIMIT :limit
             """, nativeQuery = true)
     List<BookDisplayView> findSimilarBooksExcluding(float[] vector, String languageCode, Integer userId, Integer excludeBookId, int limit);

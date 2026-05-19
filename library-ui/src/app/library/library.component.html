@@ -55,6 +55,67 @@
       }
     </mat-tab>
 
+    <mat-tab [label]="t('tabs.moodSearch')">
+      <div class="mood-search-container">
+        <div class="mood-search-header">
+          <p class="mood-search-label">{{ t('moodSearch.label') }}</p>
+          <div class="mood-search-input-wrapper">
+            <mat-form-field appearance="outline" class="mood-search-field">
+              <mat-label>{{ t('moodSearch.placeholder') }}</mat-label>
+              <textarea matInput
+                        [(ngModel)]="moodQuery"
+                        rows="3"
+                        [placeholder]="t('moodSearch.placeholder')"
+                        (keyup.enter)="onMoodSearch()"></textarea>
+            </mat-form-field>
+            <div class="mood-search-actions">
+              <mat-checkbox [(ngModel)]="onlyToRead" class="mood-search-checkbox">
+                {{ t('moodSearch.onlyToRead') }}
+              </mat-checkbox>
+              <button mat-flat-button
+                      color="primary"
+                      class="mood-search-button"
+                      [disabled]="loadingMood() || !moodQuery().trim()"
+                      (click)="onMoodSearch()">
+                <mat-icon>psychology</mat-icon>
+                <span>{{ t('moodSearch.button') }}</span>
+              </button>
+            </div>
+          </div>
+          <p class="mood-search-hint">
+            <mat-icon inline>info</mat-icon>
+            {{ t('moodSearch.hint') }}
+          </p>
+        </div>
+
+        @if (loadingMood()) {
+          <div class="mood-search-loader">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>{{ t('moodSearch.searching') }}</p>
+          </div>
+        } @else if (moodResults().length > 0) {
+          <div [class.books-grid]="viewMode() === 'grid'" [class.books-list]="viewMode() === 'list'">
+            @for (lb of moodResults(); track lb.id) {
+              @if (viewMode() === 'grid') {
+                <app-book-card [book]="lb.book"
+                               [actionsMenu]="libraryBookMenu"
+                               [menuData]="{ libraryBook: lb }"></app-book-card>
+              } @else {
+                <app-book-list-item [book]="lb.book"
+                                    [actionsMenu]="libraryBookMenu"
+                                    [menuData]="{ libraryBook: lb }"></app-book-list-item>
+              }
+            }
+          </div>
+        } @else if (moodSearched()) {
+          <div class="mood-no-results">
+            <mat-icon>search_off</mat-icon>
+            <p>{{ t('moodSearch.noResults') }}</p>
+          </div>
+        }
+      </div>
+    </mat-tab>
+
   </mat-tab-group>
 </div>
 

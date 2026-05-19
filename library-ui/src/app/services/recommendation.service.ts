@@ -14,23 +14,39 @@ export class RecommendationService {
   }
 
   getPersonalized(limit?: number): Observable<Book[]> {
-    return this.apiService.get<Book[]>(this.baseUrl, {params: {limit}});
+    const params: any = {};
+    if (limit) params.limit = limit;
+    return this.apiService.get<Book[]>(this.baseUrl, {params});
   }
 
   getPopular(limit?: number): Observable<Book[]> {
-    return this.apiService.get<Book[]>(`${this.baseUrl}/popular`, {params: {limit}});
+    const params: any = {};
+    if (limit) params.limit = limit;
+    return this.apiService.get<Book[]>(`${this.baseUrl}/popular`, {params});
   }
 
   getNewArrivals(limit?: number): Observable<Book[]> {
-    return this.apiService.get<Book[]>(`${this.baseUrl}/new`, {params: {limit}});
+    const params: any = {};
+    if (limit) params.limit = limit;
+    return this.apiService.get<Book[]>(`${this.baseUrl}/new`, {params});
   }
 
   getTrendingInFavoriteGenres(limit?: number): Observable<Book[]> {
-    return this.apiService.get<Book[]>(`${this.baseUrl}/trending-genres`, {params: {limit}});
+    const params: any = {};
+    if (limit) params.limit = limit;
+    return this.apiService.get<Book[]>(`${this.baseUrl}/trending-genres`, {params});
   }
 
   getSimilar(bookId: number, limit?: number): Observable<Book[]> {
-    return this.apiService.get<Book[]>(`${this.baseUrl}/similar/${bookId}`, {params: {limit}});
+    const params: any = {limit};
+    if (!limit) delete params.limit;
+    return this.apiService.get<Book[]>(`${this.baseUrl}/similar/${bookId}`, {params});
+  }
+
+  searchByMood(query: string, limit?: number): Observable<Book[]> {
+    const params: any = {query};
+    if (limit) params.limit = limit;
+    return this.apiService.get<Book[]>(`${this.baseUrl}/search-by-mood`, {params});
   }
 
 }

@@ -437,7 +437,6 @@ export class CollectionComponent implements OnInit {
         }
       });
 
-      // todo duplicate code
       dialogRef.afterClosed().pipe(filter(result => result !== undefined)).subscribe((selection: SelectedCollection) => {
         if (selection.id) {
           this.collectionBookService.addBookToCollection(selection.id, libraryBook.id).subscribe({

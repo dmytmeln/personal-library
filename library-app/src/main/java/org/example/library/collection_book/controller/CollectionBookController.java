@@ -6,7 +6,7 @@ import org.example.library.collection_book.dto.CollectionBookSearchParams;
 import org.example.library.collection_book.service.CollectionBookService;
 import org.example.library.library_book.dto.BulkRequest;
 import org.example.library.library_book.dto.LibraryBookDto;
-import org.example.library.pagination.PaginationParams;
+import org.example.library.common.pagination.PaginationParams;
 import org.example.library.security.UserPrincipal;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;

@@ -6,7 +6,7 @@ import org.example.library.book.domain.Book;
 import org.example.library.book.domain.BookStatus;
 import org.example.library.book.repository.BookRepository;
 import org.example.library.config.BaseIntegrationTest;
-import org.example.library.exception.NotFoundException;
+import org.example.library.common.exception.NotFoundException;
 import org.example.library.library_book.domain.LibraryBook;
 import org.example.library.library_book.repository.LibraryBookRepository;
 import org.example.library.note.domain.Note;

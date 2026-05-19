@@ -93,7 +93,7 @@ public class LibraryBookViewRepositoryCustomImpl implements LibraryBookViewRepos
         }
 
         if (searchParams.getTitle() != null && !searchParams.getTitle().isBlank()) {
-            whereSql.append("AND lbv.title ILIKE :title ");
+            whereSql.append("AND (lbv.title ILIKE :title OR lbv.title % :rawTitle) ");
         }
 
         return whereSql;
@@ -105,6 +105,7 @@ public class LibraryBookViewRepositoryCustomImpl implements LibraryBookViewRepos
         query.setParameter("lang", lang);
         if (searchParams.getTitle() != null && !searchParams.getTitle().isBlank()) {
             query.setParameter("title", "%" + searchParams.getTitle() + "%");
+            query.setParameter("rawTitle", searchParams.getTitle());
         }
     }
 

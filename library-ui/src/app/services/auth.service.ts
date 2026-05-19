@@ -1,6 +1,6 @@
-import {Injectable, signal} from '@angular/core';
+import {computed, Injectable, signal} from '@angular/core';
 import {Observable, of} from 'rxjs';
-import {catchError, switchMap, tap} from 'rxjs/operators';
+import {catchError, map, tap} from 'rxjs/operators';
 import {ApiService} from './api.service';
 import {UserRegisterRequest} from '../interfaces/user-register-request';
 import {UserResponse, UserRole} from '../interfaces/user-response';
@@ -13,6 +13,9 @@ import {UpdateProfileRequest} from '../interfaces/update-profile-request';
 export class AuthService {
 
   currentUser = signal<UserResponse | null>(null);
+
+  isAdmin = computed(() => this.currentUser()?.role === UserRole.ADMIN);
+  isUser = computed(() => this.currentUser()?.role === UserRole.USER);
 
   constructor(private apiService: ApiService) {
   }
@@ -41,10 +44,6 @@ export class AuthService {
     );
   }
 
-  private getCurrentUser(): Observable<UserResponse> {
-    return this.apiService.get<UserResponse>('/users/me', {});
-  }
-
   logout(): Observable<void> {
     return this.apiService.post<void>('/auth/logout', {}).pipe(
       tap(() => {
@@ -61,26 +60,22 @@ export class AuthService {
     this.currentUser.set(null);
   }
 
-  isAdmin(): boolean {
-    return this.currentUser()?.role === UserRole.ADMIN;
-  }
-
-  isUser(): boolean {
-    return this.currentUser()?.role === UserRole.USER;
-  }
-
   isAuthenticated(): Observable<boolean> {
-    if (!!this.currentUser()) {
+    if (this.currentUser()) {
       return of(true);
     }
 
     return this.getCurrentUser().pipe(
-      switchMap((response) => {
-        this.currentUser.set(response);
-        return of(true);
-      }),
+      tap(response => this.currentUser.set(response)),
+      map(() => true),
       catchError(() => of(false))
     );
+  }
+
+  private getCurrentUser(): Observable<UserResponse> {
+    return this.apiService.get<UserResponse>('/users/me', {
+      headers: {'X-Skip-Auth-Redirect': 'true'}
+    });
   }
 
 }

@@ -24,8 +24,7 @@ public class AuthService {
         var authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         authRequest.getEmail(),
-                        authRequest.getPassword()
-                ));
+                        authRequest.getPassword()));
         var userDetails = (UserDetailsImpl) authentication.getPrincipal();
         var tokenResponse = refreshTokenService.generateNewTokens(userDetails.user());
         log.info("[LOGIN_SUCCESS] User: {}", authRequest.getEmail());

@@ -1,10 +1,7 @@
 package org.example.library.recommendation.job;
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.library.recommendation.service.GenreMappingService;
-import org.example.library.recommendation.service.GenreMappingService.GenreChangeType;
 import org.example.library.recommendation.service.GlobalRebuildService;
-import org.example.library.recommendation.service.RecommendationTriggerService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Lazy;
@@ -18,17 +15,11 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnProperty(name = "app.recommendations.enabled", havingValue = "true", matchIfMissing = true)
 public class RecommendationRebuildJob {
 
-    private final RecommendationTriggerService triggerService;
-    private final GenreMappingService genreMappingService;
     private final GlobalRebuildService rebuildService;
     private final RecommendationRebuildJob self;
 
-    public RecommendationRebuildJob(RecommendationTriggerService triggerService,
-                                    GenreMappingService genreMappingService,
-                                    GlobalRebuildService rebuildService,
+    public RecommendationRebuildJob(GlobalRebuildService rebuildService,
                                     @Lazy RecommendationRebuildJob self) {
-        this.triggerService = triggerService;
-        this.genreMappingService = genreMappingService;
         this.rebuildService = rebuildService;
         this.self = self;
     }
@@ -42,23 +33,9 @@ public class RecommendationRebuildJob {
     @Scheduled(cron = "0 0 3 * * *")
     @Transactional
     public void run() {
-        boolean shouldRebuildVocab = triggerService.shouldRebuildVocabulary();
-        var genreChangeType = triggerService.getGenreChangeType();
-
-        if (shouldRebuildVocab) {
-            if (GenreChangeType.REBUILD == genreChangeType) {
-                genreMappingService.rebuildGenreMapping();
-            } else if (GenreChangeType.APPEND == genreChangeType) {
-                genreMappingService.appendNewCategories();
-            }
-            log.info("Starting full rebuild of recommendation model...");
-            rebuildService.executeFullRebuild();
-        } else if (GenreChangeType.NONE != genreChangeType) {
-            log.info("Incremental genre mapping update...");
-            genreMappingService.appendNewCategories();
-        } else {
-            log.info("Recommendation model is up to date.");
-        }
+        log.info("Starting scheduled recommendation model update...");
+        rebuildService.executeFullRebuild();
+        log.info("Scheduled recommendation model update completed.");
     }
 
 }

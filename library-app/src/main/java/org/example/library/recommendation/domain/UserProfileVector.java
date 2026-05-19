@@ -24,13 +24,10 @@ public class UserProfileVector {
     @Column(name = "user_id")
     private Integer userId;
 
-    @Column(name = "vector", nullable = false, columnDefinition = "vector(1100)")
+    @Column(name = "embedding", nullable = false, columnDefinition = "vector(384)")
     @JdbcTypeCode(SqlTypes.VECTOR)
-    @Array(length = 1100)
-    private float[] vector;
-
-    @Column(name = "version", nullable = false)
-    private Integer version;
+    @Array(length = 384)
+    private float[] embedding;
 
     @Column(name = "updated_at", nullable = false)
     @Builder.Default

@@ -17,6 +17,9 @@ import java.util.Optional;
 @Component
 public class CookieUtils {
 
+    private static final String REFRESH_TOKEN_PATH = "/api/v1/auth/refresh";
+
+
     @Value("${application.security.jwt.access-cookie-name}")
     private String accessTokenCookieName;
 
@@ -35,8 +38,8 @@ public class CookieUtils {
 
     public void setTokenCookies(HttpServletResponse response, TokenResponse tokenResponse) {
         setCookie(response, accessTokenCookieName, tokenResponse.accessToken(), accessTokenExpirationMs);
-        setCookie(response, refreshTokenCookieName, tokenResponse.refreshToken(), refreshTokenExpirationMs);
-        setCookie(response, refreshTokenIdCookieName, String.valueOf(tokenResponse.refreshTokenId()), refreshTokenExpirationMs);
+        setCookie(response, refreshTokenCookieName, tokenResponse.refreshToken(), refreshTokenExpirationMs, REFRESH_TOKEN_PATH);
+        setCookie(response, refreshTokenIdCookieName, String.valueOf(tokenResponse.refreshTokenId()), refreshTokenExpirationMs, REFRESH_TOKEN_PATH);
     }
 
     public void clearTokenCookies(HttpServletResponse response) {
@@ -45,11 +48,25 @@ public class CookieUtils {
         deleteCookie(response, refreshTokenIdCookieName);
     }
 
+    public Optional<String> getCookieValue(HttpServletRequest request, String name) {
+        if (request.getCookies() == null)
+            return Optional.empty();
+
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> name.equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst();
+    }
+
     private void setCookie(HttpServletResponse response, String name, String value, long maxAgeMs) {
+        setCookie(response, name, value, maxAgeMs, "/");
+    }
+
+    private void setCookie(HttpServletResponse response, String name, String value, long maxAgeMs, String path) {
         var cookie = ResponseCookie.from(name, value)
                 .httpOnly(true)
                 .secure(true)
-                .path("/")
+                .path(path)
                 .maxAge(maxAgeMs / 1000)
                 .sameSite("Lax")
                 .build();
@@ -65,16 +82,6 @@ public class CookieUtils {
                 .sameSite("Lax")
                 .build();
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-    }
-
-    public Optional<String> getCookieValue(HttpServletRequest request, String name) {
-        if (request.getCookies() == null)
-            return Optional.empty();
-
-        return Arrays.stream(request.getCookies())
-                .filter(cookie -> name.equals(cookie.getName()))
-                .map(Cookie::getValue)
-                .findFirst();
     }
 
 }
