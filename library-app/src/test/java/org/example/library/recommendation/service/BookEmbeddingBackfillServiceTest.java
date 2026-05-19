@@ -19,7 +19,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class GlobalRebuildServiceTest {
+class BookEmbeddingBackfillServiceTest {
 
     @Mock
     private BookRepository bookRepository;
@@ -27,17 +27,17 @@ class GlobalRebuildServiceTest {
     @Mock
     private BatchEmbeddingProcessor batchEmbeddingProcessor;
 
-    private GlobalRebuildService globalRebuildService;
+    private BookEmbeddingBackfillService bookEmbeddingBackfillService;
 
 
     @BeforeEach
     void setUp() {
-        globalRebuildService = new GlobalRebuildService(bookRepository, batchEmbeddingProcessor);
-        globalRebuildService.setBatchPageRequest(2);
+        bookEmbeddingBackfillService = new BookEmbeddingBackfillService(bookRepository, batchEmbeddingProcessor);
+        bookEmbeddingBackfillService.setBatchPageRequest(2);
     }
 
     @Test
-    void shouldExecuteFullRebuildSuccessfully() {
+    void shouldBackfillEmbeddingsSuccessfully() {
         var book1 = new Book();
         var book2 = new Book();
         var book3 = new Book();
@@ -49,7 +49,7 @@ class GlobalRebuildServiceTest {
                 .thenReturn(new PageImpl<>(batch1))
                 .thenReturn(new PageImpl<>(batch2));
 
-        globalRebuildService.executeFullRebuild();
+        bookEmbeddingBackfillService.backfillEmbeddings();
 
         verify(batchEmbeddingProcessor, times(1)).processBatch(batch1);
         verify(batchEmbeddingProcessor, times(1)).processBatch(batch2);
@@ -60,7 +60,7 @@ class GlobalRebuildServiceTest {
     void shouldDoNothingWhenNoBooksNeedEmbedding() {
         when(bookRepository.countBooksWithoutEmbedding()).thenReturn(0L);
 
-        globalRebuildService.executeFullRebuild();
+        bookEmbeddingBackfillService.backfillEmbeddings();
 
         verify(bookRepository, never()).findBooksWithoutEmbedding(any());
         verify(batchEmbeddingProcessor, never()).processBatch(any());

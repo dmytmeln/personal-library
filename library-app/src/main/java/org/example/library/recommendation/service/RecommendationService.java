@@ -8,6 +8,7 @@ import org.example.library.book.repository.BookRepository;
 import org.example.library.common.exception.InvalidPaginationParameterException;
 import org.example.library.common.exception.NotFoundException;
 import org.example.library.common.pagination.PaginationProperties;
+import org.example.library.recommendation.adapter.EmbeddingModelAdapter;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +28,7 @@ public class RecommendationService {
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
     private final PaginationProperties paginationProperties;
-    private final org.example.library.recommendation.adapter.EmbeddingModelAdapter embeddingModelAdapter;
+    private final EmbeddingModelAdapter embeddingModelAdapter;
 
 
     @Transactional

@@ -42,7 +42,7 @@ class EmbeddingServiceTest {
         var result = embeddingService.generateEmbedding(book);
 
         assertThat(result).isEqualTo(expectedVector);
-        String expectedInput = "Title: Test Title. Category: Fiction. Description: Test Description";
+        String expectedInput = "Title: Test Title. Category: Fiction. Authors: , Description: Test Description";
         verify(embeddingModelAdapter).embed(expectedInput);
     }
 
@@ -59,8 +59,8 @@ class EmbeddingServiceTest {
 
         assertThat(result).isEqualTo(expectedVectors);
         var expectedInputs = List.of(
-                "Title: Title 1. Category: Fiction. Description: Desc 1",
-                "Title: Title 2. Category: Science. Description: Desc 2");
+                "Title: Title 1. Category: Fiction. Authors: , Description: Desc 1",
+                "Title: Title 2. Category: Science. Authors: , Description: Desc 2");
         verify(embeddingModelAdapter).embed(expectedInputs);
     }
 
@@ -81,7 +81,7 @@ class EmbeddingServiceTest {
 
         assertThatThrownBy(() -> embeddingService.generateEmbedding(book))
                 .isInstanceOf(NullPointerException.class)
-                .hasMessage("English translation must not be null");
+                .hasMessage("Default translation must not be null");
     }
 
     @Test

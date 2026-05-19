@@ -17,8 +17,8 @@ public interface NoteMapper {
     VoiceNoteResponse toVoiceNoteResponse(Note note);
 
     @BeforeMapping
-    default void validateVoiceNote(Note note) {
-        if (note.getNoteType() != Note.NoteType.VOICE) {
+    default void validateVoiceNote(Note note, @TargetType Class<?> targetType) {
+        if (targetType.equals(VoiceNoteResponse.class) && note.getNoteType() != Note.NoteType.VOICE) {
             throw new MappingException("Cannot map non-VOICE note to VoiceNoteResponse");
         }
     }

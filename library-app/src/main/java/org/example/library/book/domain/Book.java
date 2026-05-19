@@ -9,6 +9,8 @@ import org.hibernate.annotations.Array;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -60,7 +62,8 @@ public class Book {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @MapKey(name = "languageCode")
-    private Map<String, BookTranslation> translations;
+    @Builder.Default
+    private Map<String, BookTranslation> translations = new HashMap<>();
 
     @ManyToMany
     @JoinTable(
@@ -68,7 +71,8 @@ public class Book {
             joinColumns = {@JoinColumn(name = "book_id", nullable = false)},
             inverseJoinColumns = {@JoinColumn(name = "author_id", nullable = false)}
     )
-    private Set<Author> authors;
+    @Builder.Default
+    private Set<Author> authors = new HashSet<>();
 
     @Override
     public boolean equals(Object o) {
@@ -82,6 +86,9 @@ public class Book {
     }
 
     public BookTranslation getDefaultTranslation() {
+        if (translations == null) {
+            throw new NullPointerException("Book translations must not be null");
+        }
         return translations.get("en");
     }
 

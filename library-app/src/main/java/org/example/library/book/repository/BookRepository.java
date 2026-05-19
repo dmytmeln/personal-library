@@ -39,7 +39,7 @@ public interface BookRepository extends JpaRepository<Book, Integer>, JpaSpecifi
     @Query("SELECT COUNT(b) FROM Book b WHERE b.owner IS NULL AND b.embedding IS NULL")
     long countBooksWithoutEmbedding();
 
-    @EntityGraph(attributePaths = {"category", "translations", "category.translations"}, type = EntityGraph.EntityGraphType.LOAD)
+    @EntityGraph(attributePaths = {"category", "translations", "category.translations"/*, "authors", "authors.translations"*/}, type = EntityGraph.EntityGraphType.LOAD)
     @Query("SELECT b FROM Book b WHERE b.owner IS NULL AND b.embedding IS NULL")
     Page<Book> findBooksWithoutEmbedding(Pageable pageable);
 

@@ -8,7 +8,10 @@ import org.example.library.book.repository.BookRepository;
 import org.example.library.category.domain.Category;
 import org.example.library.category.domain.CategoryTranslation;
 import org.example.library.category.repository.CategoryRepository;
+import org.example.library.collection.domain.Collection;
 import org.example.library.collection.repository.CollectionRepository;
+import org.example.library.collection_book.domain.CollectionBook;
+import org.example.library.collection_book.domain.CollectionBookId;
 import org.example.library.collection_book.repository.CollectionBookRepository;
 import org.example.library.common.pagination.PaginationParams;
 import org.example.library.config.BaseIntegrationTest;
@@ -17,6 +20,10 @@ import org.example.library.library_book.domain.LibraryBookStatus;
 import org.example.library.library_book.dto.CreateLocalBookDto;
 import org.example.library.library_book.dto.LibraryBookSearchCriteria;
 import org.example.library.library_book.repository.LibraryBookRepository;
+import org.example.library.note.domain.Note;
+import org.example.library.note.repository.NoteRepository;
+import org.example.library.quote.domain.Quote;
+import org.example.library.quote.repository.QuoteRepository;
 import org.example.library.user.domain.Role;
 import org.example.library.user.domain.User;
 import org.example.library.user.repository.UserRepository;
@@ -58,6 +65,12 @@ class LibraryBookServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
     private AuthorRepository authorRepository;
+
+    @Autowired
+    private NoteRepository noteRepository;
+
+    @Autowired
+    private QuoteRepository quoteRepository;
 
     @Autowired
     private LibraryBookService service;
@@ -285,6 +298,40 @@ class LibraryBookServiceIntegrationTest extends BaseIntegrationTest {
         assertThat(results.stream().anyMatch(r -> r.getBook().getTitle().equals("Space Adventure"))).isFalse();
     }
 
+
+    @Test
+    void shouldCascadeDeleteDependencies() {
+        var book = saveBook("Cascade Test Book");
+        var libraryBook = saveLibraryBook(book, defaultUser);
+        var collection = collectionRepository.save(Collection.builder()
+                .name("Test Collection")
+                .user(defaultUser)
+                .build());
+        transactionTemplate.executeWithoutResult(status -> {
+            var managedLibraryBook = repository.findById(libraryBook.getId()).orElseThrow();
+            var managedCollection = collectionRepository.findById(collection.getId()).orElseThrow();
+            collectionBookRepository.save(CollectionBook.builder()
+                    .id(new CollectionBookId(managedLibraryBook.getId(), managedCollection.getId()))
+                    .libraryBook(managedLibraryBook)
+                    .collection(managedCollection)
+                    .build());
+            noteRepository.save(Note.builder()
+                    .libraryBook(managedLibraryBook)
+                    .content("Test Note")
+                    .build());
+            quoteRepository.save(Quote.builder()
+                    .libraryBook(managedLibraryBook)
+                    .text("Test Quote 1")
+                    .build());
+        });
+
+        service.delete(libraryBook.getId(), defaultUser.getId());
+
+        assertThat(repository.existsById(libraryBook.getId())).isFalse();
+        assertThat(noteRepository.findByLibraryBookIdAndLibraryBookUserId(libraryBook.getId(), defaultUser.getId())).isEmpty();
+        assertThat(quoteRepository.findByLibraryBookIdAndLibraryBookUserIdOrderByCreatedAtDesc(libraryBook.getId(), defaultUser.getId())).isEmpty();
+        assertThat(collectionBookRepository.existsById(new CollectionBookId(libraryBook.getId(), collection.getId()))).isFalse();
+    }
 
     private User saveUser() {
         var user = User.builder()

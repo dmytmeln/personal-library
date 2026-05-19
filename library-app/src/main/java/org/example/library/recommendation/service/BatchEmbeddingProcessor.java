@@ -27,6 +27,7 @@ public class BatchEmbeddingProcessor {
             book.setStatus(BookStatus.SYNCED);
         }
 
-        bookRepository.saveAllAndFlush(books);
+        bookRepository.saveAll(books);
     }
+
 }

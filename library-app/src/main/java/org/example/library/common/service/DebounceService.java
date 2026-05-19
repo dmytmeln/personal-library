@@ -16,7 +16,6 @@ public class DebounceService {
     private final ThreadPoolTaskScheduler debounceTaskScheduler;
     private final ConcurrentHashMap<String, ScheduledFuture<?>> pending = new ConcurrentHashMap<>();
 
-
     public void debounce(String key, Runnable task, Duration delay) {
         ScheduledFuture<?> next = debounceTaskScheduler.schedule(task, Instant.now().plus(delay));
 

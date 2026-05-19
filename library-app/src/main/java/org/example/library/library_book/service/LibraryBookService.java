@@ -8,7 +8,6 @@ import org.example.library.book.domain.BookStatus;
 import org.example.library.book.dto.LanguageWithCount;
 import org.example.library.book.repository.BookRepository;
 import org.example.library.category.repository.CategoryRepository;
-import org.example.library.collection_book.repository.CollectionBookRepository;
 import org.example.library.common.exception.BadRequestException;
 import org.example.library.common.exception.NotFoundException;
 import org.example.library.common.pagination.PageRequestBuilder;
@@ -46,7 +45,6 @@ public class LibraryBookService {
 
     private final LibraryBookRepository repository;
     private final LibraryBookViewRepository viewRepository;
-    private final CollectionBookRepository collectionBookRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
@@ -283,7 +281,6 @@ public class LibraryBookService {
         var libraryBook = repository.findByIdAndUserIdWithBook(libraryBookId, userId)
                 .orElseThrow(() -> new NotFoundException("error.library_book.not_found"));
         var book = libraryBook.getBook();
-        collectionBookRepository.deleteByLibraryBookIdAndUserId(libraryBookId, userId);
         repository.delete(libraryBook);
 
         if (book.getOwner() == null) {
@@ -303,7 +300,6 @@ public class LibraryBookService {
                 .map(lb -> lb.getBook().getId())
                 .toList();
 
-        collectionBookRepository.deleteAllByLibraryBookIdInAndUserId(libraryBookIds, userId);
         repository.deleteAll(libraryBooks);
 
         if (!globalBookIds.isEmpty()) {

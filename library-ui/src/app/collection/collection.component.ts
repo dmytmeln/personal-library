@@ -49,6 +49,7 @@ import {SelectionStore} from '../services/selection.store';
 import {BulkActionBarComponent} from '../common/bulk-action-bar/bulk-action-bar.component';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {NoteDialogComponent} from '../dialogs/note-dialog/note-dialog.component';
+import {LocationDialogComponent} from '../dialogs/location-dialog/location-dialog.component';
 import {QuotesListDialogComponent} from '../dialogs/quotes-list-dialog/quotes-list-dialog.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
@@ -530,6 +531,18 @@ export class CollectionComponent implements OnInit {
         bookTitle: libraryBook.book.title
       },
       width: '600px'
+    });
+  }
+
+  openLocationDialog(libraryBook: LibraryBook): void {
+    this.dialog.open(LocationDialogComponent, {
+      data: {
+        libraryBookId: libraryBook.id,
+        location: libraryBook.location
+      }
+    }).afterClosed().pipe(filter(Boolean)).subscribe(() => {
+      this.loadBooks();
+      this.snackCommon.showSuccess(this.translocoService.translate('common.success.saved'));
     });
   }
 

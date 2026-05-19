@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.library.library_book.domain.LibraryBook;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -54,6 +56,7 @@ public class Note {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "library_book_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private LibraryBook libraryBook;
 
     public enum NoteType {

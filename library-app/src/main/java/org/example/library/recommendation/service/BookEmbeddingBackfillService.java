@@ -5,10 +5,11 @@ import org.example.library.book.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
-public class GlobalRebuildService {
+public class BookEmbeddingBackfillService {
 
     private final BookRepository bookRepository;
     private final BatchEmbeddingProcessor batchEmbeddingProcessor;
@@ -20,14 +21,14 @@ public class GlobalRebuildService {
         this.batchPageRequest = PageRequest.of(0, batchSize);
     }
 
-    public GlobalRebuildService(BookRepository bookRepository,
-                                BatchEmbeddingProcessor batchEmbeddingProcessor) {
+    public BookEmbeddingBackfillService(BookRepository bookRepository,
+                                        BatchEmbeddingProcessor batchEmbeddingProcessor) {
         this.bookRepository = bookRepository;
         this.batchEmbeddingProcessor = batchEmbeddingProcessor;
     }
 
-
-    public void executeFullRebuild() {
+    @Transactional(readOnly = true)
+    public void backfillEmbeddings() {
         log.info("Starting embedding rebuild for all books missing embeddings...");
 
         long totalToUpdate = bookRepository.countBooksWithoutEmbedding();

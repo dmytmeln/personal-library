@@ -44,6 +44,7 @@ class BatchEmbeddingProcessorTest {
         assertThat(book2.getEmbedding()).isEqualTo(vector2);
         assertThat(book2.getStatus()).isEqualTo(BookStatus.SYNCED);
 
-        verify(bookRepository).saveAllAndFlush(books);
+        verify(bookRepository).saveAll(books);
     }
+
 }

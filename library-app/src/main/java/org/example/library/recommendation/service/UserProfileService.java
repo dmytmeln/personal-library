@@ -25,11 +25,9 @@ public class UserProfileService {
 
     private static final int EMBEDDING_SIZE = 384;
 
-
     private final LibraryBookRepository libraryBookRepository;
     private final UserProfileVectorRepository userProfileVectorRepository;
     private final RecommendationProperties properties;
-
 
     @Transactional(readOnly = true)
     public Optional<float[]> getUserProfileEmbedding(Integer userId) {

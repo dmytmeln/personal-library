@@ -26,10 +26,10 @@ import static org.assertj.core.api.Assertions.assertThat;
         "recommendations.trigger.count=2",
         "recommendations.rebuild.batch-size=1"
 })
-class GlobalRebuildServiceIntegrationTest extends BaseIntegrationTest {
+class BookEmbeddingBackfillServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
-    private GlobalRebuildService globalRebuildService;
+    private BookEmbeddingBackfillService bookEmbeddingBackfillService;
 
     @Autowired
     private BookRepository bookRepository;
@@ -75,7 +75,7 @@ class GlobalRebuildServiceIntegrationTest extends BaseIntegrationTest {
     void shouldUpdateBooksMissingEmbeddings() {
         saveBook("Only Book", "Description");
 
-        globalRebuildService.executeFullRebuild();
+        bookEmbeddingBackfillService.backfillEmbeddings();
 
         var books = bookRepository.findAll();
         assertThat(books).hasSize(1);
@@ -90,7 +90,7 @@ class GlobalRebuildServiceIntegrationTest extends BaseIntegrationTest {
         existingEmbedding[0] = 0.5f;
         saveBookWithEmbedding("Existing Book", "Description", existingEmbedding);
 
-        globalRebuildService.executeFullRebuild();
+        bookEmbeddingBackfillService.backfillEmbeddings();
 
         var books = bookRepository.findAll();
         assertThat(books).hasSize(1);
@@ -103,7 +103,7 @@ class GlobalRebuildServiceIntegrationTest extends BaseIntegrationTest {
         saveBook("Book 2", "Desc 2");
         saveBook("Book 3", "Desc 3");
 
-        globalRebuildService.executeFullRebuild();
+        bookEmbeddingBackfillService.backfillEmbeddings();
 
         var books = bookRepository.findAll();
         assertThat(books).hasSize(3);
@@ -118,7 +118,7 @@ class GlobalRebuildServiceIntegrationTest extends BaseIntegrationTest {
         saveBookWithEmbedding("Has Embedding", "Desc", existingEmbedding);
         saveBook("No Embedding", "Desc");
 
-        globalRebuildService.executeFullRebuild();
+        bookEmbeddingBackfillService.backfillEmbeddings();
 
         transactionTemplate.executeWithoutResult(status -> {
             var allBooks = bookRepository.findAll();

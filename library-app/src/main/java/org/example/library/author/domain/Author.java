@@ -5,6 +5,7 @@ import lombok.*;
 import org.example.library.book.domain.Book;
 import org.example.library.book.domain.Book_;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,7 +36,8 @@ public class Author {
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @MapKey(name = "languageCode")
-    private Map<String, AuthorTranslation> translations;
+    @Builder.Default
+    private Map<String, AuthorTranslation> translations = new HashMap<>();
 
     @ManyToMany(mappedBy = Book_.AUTHORS)
     private List<Book> books;
@@ -52,6 +54,9 @@ public class Author {
     }
 
     public AuthorTranslation getDefaultTranslation() {
+        if (translations == null) {
+            throw new NullPointerException("Author translations must not be null");
+        }
         return translations.get("en");
     }
 

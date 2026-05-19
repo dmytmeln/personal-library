@@ -164,17 +164,12 @@
           <mat-icon>format_quote</mat-icon>
           <span>{{ m('myQuotes') }}</span>
         </button>
-        @if (libraryBook.book.ownerId) {
-          <button mat-menu-item (click)="openUpdateLocalBookDialog(libraryBook)">
-            <mat-icon>edit</mat-icon>
-            <span>{{ t('editDetails') }}</span>
-          </button>
-        } @else {
-          <button mat-menu-item (click)="openEditDetailsDialog(libraryBook)">
-            <mat-icon>edit</mat-icon>
-            <span>{{ t('editDetails') }}</span>
-          </button>
-        }
+
+        <button mat-menu-item [matMenuTriggerFor]="bookInfoMenu" [matMenuTriggerData]="{ libraryBook: libraryBook }">
+          <mat-icon>info</mat-icon>
+          <span>{{ m('bookInformation') }}</span>
+        </button>
+
         <button mat-menu-item (click)="addToCollection(libraryBook)">
           <mat-icon>playlist_add</mat-icon>
           <span>{{ t('addToCollection') }}</span>
@@ -203,7 +198,31 @@
         </button>
       </ng-container>
     </ng-template>
-  </mat-menu></div>
+  </mat-menu>
+
+  <mat-menu #bookInfoMenu="matMenu">
+    <ng-template matMenuContent let-libraryBook="libraryBook">
+      <ng-container *transloco="let m; prefix: 'library.menu'">
+        @if (libraryBook.book.ownerId) {
+          <button mat-menu-item (click)="openUpdateLocalBookDialog(libraryBook)">
+            <mat-icon>edit</mat-icon>
+            <span>{{ m('editDetails') }}</span>
+          </button>
+        } @else {
+          <button mat-menu-item (click)="openEditDetailsDialog(libraryBook)">
+            <mat-icon>edit</mat-icon>
+            <span>{{ m('editDetails') }}</span>
+          </button>
+        }
+        <button mat-menu-item (click)="openLocationDialog(libraryBook)">
+          <mat-icon>location_on</mat-icon>
+          <span>{{ m('location') }}</span>
+        </button>
+      </ng-container>
+    </ng-template>
+  </mat-menu>
+  </div>
+
 
 <app-library-book-menu-items #sharedMenu
                              (statusChange)="statusChange($event)"

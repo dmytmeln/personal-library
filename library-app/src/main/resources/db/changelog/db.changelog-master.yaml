@@ -65,3 +65,5 @@ databaseChangeLog:
       file: db/changelog/changelog-tables/changeset/seed_data.yaml
   - include:
       file: db/changelog/changelog-tables/changeset/seed_user.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/add_cascade_delete_to_library_books_relations.yaml
