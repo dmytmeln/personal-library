@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
 
 import java.util.List;
 
@@ -34,10 +35,12 @@ class BatchEmbeddingProcessorTest {
         var books = List.of(book1, book2);
         float[] vector1 = new float[]{0.1f};
         float[] vector2 = new float[]{0.2f};
+        var pageable = org.springframework.data.domain.PageRequest.of(0, 10);
 
+        when(bookRepository.findBooksWithoutEmbedding(pageable)).thenReturn(new PageImpl<>(books));
         when(embeddingService.generateEmbeddings(books)).thenReturn(List.of(vector1, vector2));
 
-        batchEmbeddingProcessor.processBatch(books);
+        batchEmbeddingProcessor.processBatch(pageable);
 
         assertThat(book1.getEmbedding()).isEqualTo(vector1);
         assertThat(book1.getStatus()).isEqualTo(BookStatus.SYNCED);

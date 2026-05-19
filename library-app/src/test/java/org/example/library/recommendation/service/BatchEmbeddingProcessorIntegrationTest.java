@@ -14,6 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 import java.util.Locale;
@@ -70,7 +71,7 @@ class BatchEmbeddingProcessorIntegrationTest extends BaseIntegrationTest {
         var book2 = createBook("Book 2", "Desc 2");
         bookRepository.saveAll(List.of(book1, book2));
 
-        batchEmbeddingProcessor.processBatch(List.of(book1, book2));
+        batchEmbeddingProcessor.processBatch(PageRequest.of(0, 10));
 
         var updatedBooks = bookRepository.findAll();
         assertThat(updatedBooks).hasSize(2);

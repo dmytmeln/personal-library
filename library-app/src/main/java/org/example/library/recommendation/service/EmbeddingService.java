@@ -27,7 +27,6 @@ public class EmbeddingService {
         return embeddingModelAdapter.embed(embeddingInput);
     }
 
-    @Transactional(readOnly = true)
     public List<float[]> generateEmbeddings(List<Book> books) {
         var embeddingInputs = books.stream()
                 .map(this::constructEmbeddingInput)

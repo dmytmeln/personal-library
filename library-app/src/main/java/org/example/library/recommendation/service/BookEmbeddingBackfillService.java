@@ -27,7 +27,6 @@ public class BookEmbeddingBackfillService {
         this.batchEmbeddingProcessor = batchEmbeddingProcessor;
     }
 
-    @Transactional(readOnly = true)
     public void backfillEmbeddings() {
         log.info("Starting embedding rebuild for all books missing embeddings...");
 
@@ -36,15 +35,11 @@ public class BookEmbeddingBackfillService {
         log.info("Found {} books that need embeddings. Iterations required: {}", totalToUpdate, iterations);
 
         for (int i = 0; i < iterations; i++) {
-            var booksWithoutEmbedding = bookRepository.findBooksWithoutEmbedding(batchPageRequest)
-                    .getContent();
-
-            if (booksWithoutEmbedding.isEmpty()) {
+            int processedCount = batchEmbeddingProcessor.processBatch(batchPageRequest);
+            if (processedCount == 0) {
                 break;
             }
-
-            batchEmbeddingProcessor.processBatch(booksWithoutEmbedding);
-            log.info("Processed batch: {} books", booksWithoutEmbedding.size());
+            log.info("Processed batch: {} books", processedCount);
         }
 
         log.info("Embedding rebuild completed.");

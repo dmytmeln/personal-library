@@ -14,6 +14,7 @@ export interface LibraryBookQueryOptions {
   sort?: string[];
   title?: string;
   status?: LibraryBookStatus | null;
+  location?: string;
   authorId?: number;
   categoryId?: number;
   publishYearMin?: number;
@@ -108,6 +109,7 @@ export class LibraryBookService {
       sort,
       title,
       status,
+      location,
       authorId,
       categoryId,
       publishYearMin,
@@ -124,6 +126,7 @@ export class LibraryBookService {
     if (sort && sort.length > 0) params.sort = sort;
     if (title) params.title = title;
     if (status) params.status = status;
+    if (location) params.location = location;
     if (authorId) params.authorId = authorId;
     if (categoryId) params.categoryId = categoryId;
     if (publishYearMin != null) params.publishYearMin = publishYearMin;

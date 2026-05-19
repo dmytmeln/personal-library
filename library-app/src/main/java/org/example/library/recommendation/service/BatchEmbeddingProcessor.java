@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import org.springframework.data.domain.Pageable;
 
 @Component
 @RequiredArgsConstructor
@@ -18,7 +18,12 @@ public class BatchEmbeddingProcessor {
     private final EmbeddingService embeddingService;
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void processBatch(List<Book> books) {
+    public int processBatch(Pageable pageable) {
+        var books = bookRepository.findBooksWithoutEmbedding(pageable).getContent();
+        if (books.isEmpty()) {
+            return 0;
+        }
+
         var embeddings = embeddingService.generateEmbeddings(books);
 
         for (int i = 0; i < books.size(); i++) {
@@ -28,6 +33,7 @@ public class BatchEmbeddingProcessor {
         }
 
         bookRepository.saveAll(books);
+        return books.size();
     }
 
 }

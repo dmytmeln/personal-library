@@ -38,21 +38,12 @@ class BookEmbeddingBackfillServiceTest {
 
     @Test
     void shouldBackfillEmbeddingsSuccessfully() {
-        var book1 = new Book();
-        var book2 = new Book();
-        var book3 = new Book();
-        var batch1 = List.of(book1, book2);
-        var batch2 = List.of(book3);
-
         when(bookRepository.countBooksWithoutEmbedding()).thenReturn(3L);
-        when(bookRepository.findBooksWithoutEmbedding(any(PageRequest.class)))
-                .thenReturn(new PageImpl<>(batch1))
-                .thenReturn(new PageImpl<>(batch2));
+        when(batchEmbeddingProcessor.processBatch(any(PageRequest.class))).thenReturn(2).thenReturn(1);
 
         bookEmbeddingBackfillService.backfillEmbeddings();
 
-        verify(batchEmbeddingProcessor, times(1)).processBatch(batch1);
-        verify(batchEmbeddingProcessor, times(1)).processBatch(batch2);
+        verify(batchEmbeddingProcessor, times(2)).processBatch(any(PageRequest.class));
         verify(bookRepository).countBooksWithoutEmbedding();
     }
 
