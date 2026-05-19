@@ -56,6 +56,7 @@ public interface LibraryBookMapper {
     @Mapping(target = "customAuthorName", ignore = true)
     @Mapping(target = "customCategoryName", ignore = true)
     @Mapping(target = "finishedAt", ignore = true)
+    @Mapping(target = "location", ignore = true)
     void update(@MappingTarget LibraryBook libraryBook, UpdateLibraryBookDetailsDto dto);
 
     @Named("authorsToMap")

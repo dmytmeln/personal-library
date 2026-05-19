@@ -16,6 +16,7 @@ public class LibraryBookViewSpecification {
         return Specification.where(hasUserId(userId))
                 .and(hasLanguageCode(lang))
                 .and(hasTitleLike(criteria.getTitle()))
+                .and(hasLocationLike(criteria.getLocation()))
                 .and(hasStatus(criteria.getStatus()))
                 .and(hasAuthorId(criteria.getAuthorId()))
                 .and(hasCategoryId(criteria.getCategoryId()))
@@ -56,6 +57,16 @@ public class LibraryBookViewSpecification {
                     cb.like(cb.lower(root.get(LibraryBookView_.TITLE)), "%" + lowerTitle + "%"),
                     cb.greaterThan(cb.function("similarity", Double.class, root.get(LibraryBookView_.TITLE), cb.literal(title)), 0.3)
             );
+        };
+    }
+
+    public static Specification<LibraryBookView> hasLocationLike(String location) {
+        return (root, query, cb) -> {
+            if (location == null || location.isBlank())
+                return null;
+
+            var lowerLocation = location.toLowerCase();
+            return cb.like(cb.lower(root.get(LibraryBookView_.LOCATION)), "%" + lowerLocation + "%");
         };
     }
 

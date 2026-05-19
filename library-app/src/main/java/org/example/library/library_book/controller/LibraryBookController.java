@@ -92,6 +92,15 @@ public class LibraryBookController {
         return service.updateStatus(libraryBookId, userPrincipal.getId(), status);
     }
 
+    @PutMapping("/{libraryBookId}/location")
+    @ResponseStatus(HttpStatus.OK)
+    public LibraryBookDto updateLocation(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                         @PathVariable Integer libraryBookId,
+                                         @Valid @RequestBody LocationDto dto
+    ) {
+        return service.updateLocation(libraryBookId, userPrincipal.getId(), dto);
+    }
+
     @PutMapping("/bulk-status")
     @ResponseStatus(HttpStatus.OK)
     public void bulkUpdateStatus(@AuthenticationPrincipal UserPrincipal userPrincipal, @Valid @RequestBody BulkStatusUpdateRequest request) {

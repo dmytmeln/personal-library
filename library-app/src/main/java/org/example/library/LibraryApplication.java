@@ -16,23 +16,6 @@ import static org.springframework.data.web.config.EnableSpringDataWebSupport.Pag
 @EnableScheduling
 public class LibraryApplication {
 
-    // TODO:
-    //  відстежувати прогрес книги по сторінках
-    //  Імпорт "в один клік" з інших платформ
-    //  "Де моя книга?" (Трекер позичок)
-    //  Локатор домашньої бібліотеки
-    //  ШІ-інсайти
-    //  додати всі книги автора до бібліотеки
-    //  pin libraryBook/collection
-    //  пошук колекцій
-    //  category/author average rating in statistics
-    //  optimize ui
-    //  optimize server
-    //  optimize db
-    //  reduce duplication
-    //  filter books by collections
-    //  integration with external book APIs (Google Books, Open Library) for searching and adding books
-
     public static void main(String[] args) {
         SpringApplication.run(LibraryApplication.class, args);
     }

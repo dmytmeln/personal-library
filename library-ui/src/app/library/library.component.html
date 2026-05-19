@@ -119,6 +119,28 @@
   </mat-tab-group>
 </div>
 
+<mat-menu #bookInfoMenu="matMenu">
+  <ng-template matMenuContent let-libraryBook="libraryBook">
+    <ng-container *transloco="let m; prefix: 'library.menu'">
+      @if (libraryBook.book.ownerId) {
+        <button mat-menu-item (click)="openUpdateLocalBookDialog(libraryBook)">
+          <mat-icon>edit</mat-icon>
+          <span>{{ m('editDetails') }}</span>
+        </button>
+      } @else {
+        <button mat-menu-item (click)="openEditDetailsDialog(libraryBook)">
+          <mat-icon>edit</mat-icon>
+          <span>{{ m('editDetails') }}</span>
+        </button>
+      }
+      <button mat-menu-item (click)="openLocationDialog(libraryBook)">
+        <mat-icon>location_on</mat-icon>
+        <span>{{ m('location') }}</span>
+      </button>
+    </ng-container>
+  </ng-template>
+</mat-menu>
+
 <mat-menu #bulkStatusMenu="matMenu">
   @for (option of statusOptions(); track option.value) {
     <button mat-menu-item (click)="bulkUpdateStatus(option.value)">
@@ -139,17 +161,12 @@
         <mat-icon>format_quote</mat-icon>
         <span>{{ m('myQuotes') }}</span>
       </button>
-      @if (libraryBook.book.ownerId) {
-        <button mat-menu-item (click)="openUpdateLocalBookDialog(libraryBook)">
-          <mat-icon>edit</mat-icon>
-          <span>{{ m('editDetails') }}</span>
-        </button>
-      } @else {
-        <button mat-menu-item (click)="openEditDetailsDialog(libraryBook)">
-          <mat-icon>edit</mat-icon>
-          <span>{{ m('editDetails') }}</span>
-        </button>
-      }
+
+      <button mat-menu-item [matMenuTriggerFor]="bookInfoMenu" [matMenuTriggerData]="{ libraryBook: libraryBook }">
+        <mat-icon>info</mat-icon>
+        <span>{{ m('bookInformation') }}</span>
+      </button>
+
       <button mat-menu-item (click)="addToCollection(libraryBook)">
         <mat-icon>playlist_add</mat-icon>
         <span>{{ m('addToCollection') }}</span>

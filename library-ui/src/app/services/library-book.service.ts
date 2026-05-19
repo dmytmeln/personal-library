@@ -86,6 +86,10 @@ export class LibraryBookService {
     return this.apiService.put(`/users/me/library-books/${libraryBookId}/details`, {body: dto});
   }
 
+  updateLocation(libraryBookId: number, location: string | null): Observable<LibraryBook> {
+    return this.apiService.put(`/users/me/library-books/${libraryBookId}/location`, {body: {location}});
+  }
+
   resetDetails(libraryBookId: number): Observable<LibraryBook> {
     return this.apiService.put(`/users/me/library-books/${libraryBookId}/details/reset`, {});
   }

@@ -126,6 +126,11 @@
       },
       "resetButton": "Reset to Defaults"
     },
+    "location": {
+      "title": "Physical Location",
+      "label": "Location",
+      "placeholder": "e.g. Living room, shelf 2, top row"
+    },
     "createLocalBook": {
       "title": "Create Manual Book",
       "fields": {
@@ -173,6 +178,7 @@
     },
     "filters": {
       "bookTitle": "Book Title",
+      "location": "Location",
       "status": "Status",
       "author": "Author",
       "category": "Category",
@@ -198,6 +204,8 @@
     },
     "menu": {
       "bookDetails": "Book Details",
+      "bookInformation": "Book Information",
+      "location": "Physical Location",
       "myNotes": "My Notes",
       "myQuotes": "My Quotes",
       "editDetails": "Edit Details",

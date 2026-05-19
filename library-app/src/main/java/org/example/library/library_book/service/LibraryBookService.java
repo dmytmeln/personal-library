@@ -17,11 +17,7 @@ import org.example.library.common.pagination.SortableFields;
 import org.example.library.library_book.domain.LibraryBook;
 import org.example.library.library_book.domain.LibraryBookStatus;
 import org.example.library.library_book.domain.LibraryBookView;
-import org.example.library.library_book.dto.CreateLocalBookDto;
-import org.example.library.library_book.dto.LibraryBookDto;
-import org.example.library.library_book.dto.LibraryBookSearchCriteria;
-import org.example.library.library_book.dto.UpdateLibraryBookDetailsDto;
-import org.example.library.library_book.dto.UpdateLocalBookDto;
+import org.example.library.library_book.dto.*;
 import org.example.library.library_book.mapper.LibraryBookMapper;
 import org.example.library.library_book.repository.LibraryBookRepository;
 import org.example.library.library_book.repository.LibraryBookViewRepository;
@@ -247,6 +243,16 @@ public class LibraryBookService {
         repository.saveAndFlush(libraryBook);
         var updatedView = getViewById(libraryBookId);
         log.info("[LIBRARY_BOOK_LOCAL_UPDATE] User ID: {}, Library Book ID: {}", userId, libraryBookId);
+        return mapper.toDto(updatedView);
+    }
+
+    @Transactional
+    public LibraryBookDto updateLocation(Integer libraryBookId, Integer userId, LocationDto dto) {
+        var libraryBook = getExistingById(libraryBookId, userId);
+        libraryBook.setLocation(dto.location());
+        repository.saveAndFlush(libraryBook);
+        var updatedView = getViewById(libraryBookId);
+        log.info("[LIBRARY_BOOK_LOCATION_UPDATE] User ID: {}, Library Book ID: {}, Location: {}", userId, libraryBookId, dto.location());
         return mapper.toDto(updatedView);
     }
 

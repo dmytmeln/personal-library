@@ -15,6 +15,7 @@ databaseChangeLog:
                   lb.rating,
                   COALESCE(lb.title, bt.title) as title,
                   COALESCE(lb.description, bt.description) as description,
+                  lb.location,
                   COALESCE(lb.publish_year, b.publish_year) as publish_year,
                   COALESCE(lb.pages, b.pages) as pages,
                   bt.language_code,

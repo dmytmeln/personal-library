@@ -15,5 +15,6 @@ public class LibraryBookDto {
     private String status;
     private LocalDateTime addedAt;
     private Byte rating;
+    private String location;
     private BookDto book;
 }

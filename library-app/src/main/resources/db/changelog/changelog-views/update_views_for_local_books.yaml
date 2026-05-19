@@ -35,6 +35,7 @@ databaseChangeLog:
                   lb.status,
                   lb.added_at,
                   lb.rating,
+                  lb.location,
                   COALESCE(lb.title, bt.title) as title,
                   COALESCE(lb.description, bt.description) as description,
                   COALESCE(lb.publish_year, b.publish_year) as publish_year,

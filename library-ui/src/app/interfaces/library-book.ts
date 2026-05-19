@@ -5,6 +5,7 @@ export interface LibraryBook {
   status: LibraryBookStatus,
   addedAt: Date,
   rating?: number,
+  location?: string | null,
   book: Book
 }
 

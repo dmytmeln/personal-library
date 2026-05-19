@@ -9,6 +9,12 @@
           [label]="f('bookTitle')"
           [value]="filters.state().title || ''"
           (valueChange)="filters.update('title', $event)"/>
+        @if (mode() === 'library') {
+          <app-text-filter
+            [label]="f('location')"
+            [value]="asLibraryFilters(filters.state()).location || ''"
+            (valueChange)="filters.update('location', $event)"/>
+        }
       </div>
 
       <div mainFilters *transloco="let f; prefix: filterPrefix()">
