@@ -49,6 +49,7 @@ import {SelectionStore} from '../services/selection.store';
 import {BulkActionBarComponent} from '../common/bulk-action-bar/bulk-action-bar.component';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {NoteDialogComponent} from '../dialogs/note-dialog/note-dialog.component';
+import {QuotesListDialogComponent} from '../dialogs/quotes-list-dialog/quotes-list-dialog.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
@@ -519,6 +520,16 @@ export class CollectionComponent implements OnInit {
       } else if (result === 'deleted') {
         this.snackCommon.showSuccess(this.translocoService.translate('library.success.noteDeleted'));
       }
+    });
+  }
+
+  openQuotesDialog(libraryBook: LibraryBook): void {
+    this.dialog.open(QuotesListDialogComponent, {
+      data: {
+        libraryBookId: libraryBook.id,
+        bookTitle: libraryBook.book.title
+      },
+      width: '600px'
     });
   }
 

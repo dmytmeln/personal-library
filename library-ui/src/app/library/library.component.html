@@ -134,6 +134,11 @@
         <mat-icon>note_alt</mat-icon>
         <span>{{ m('myNotes') }}</span>
       </button>
+
+      <button mat-menu-item (click)="openQuotesDialog(libraryBook)">
+        <mat-icon>format_quote</mat-icon>
+        <span>{{ m('myQuotes') }}</span>
+      </button>
       @if (libraryBook.book.ownerId) {
         <button mat-menu-item (click)="openUpdateLocalBookDialog(libraryBook)">
           <mat-icon>edit</mat-icon>

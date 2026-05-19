@@ -36,6 +36,7 @@ import {AuthorListComponent} from '../author-list/author-list.component';
 import {CategoryListComponent} from '../category-list/category-list.component';
 import {UpdateLibraryBookDetails} from '../interfaces/update-library-book-details';
 import {NoteDialogComponent} from '../dialogs/note-dialog/note-dialog.component';
+import {QuotesListDialogComponent} from '../dialogs/quotes-list-dialog/quotes-list-dialog.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {LibraryStore} from '../services/library.store';
 import {BookListComponent} from '../book-list/book-list.component';
@@ -370,6 +371,16 @@ export class LibraryComponent implements OnInit {
       } else if (result === 'deleted') {
         this.snackCommon.showSuccess(this.translocoService.translate('library.success.noteDeleted'));
       }
+    });
+  }
+
+  openQuotesDialog(libraryBook: LibraryBook): void {
+    this.dialog.open(QuotesListDialogComponent, {
+      data: {
+        libraryBookId: libraryBook.id,
+        bookTitle: libraryBook.book.title
+      },
+      width: '600px'
     });
   }
 

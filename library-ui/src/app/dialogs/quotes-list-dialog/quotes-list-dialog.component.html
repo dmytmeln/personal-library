@@ -1,0 +1,57 @@
+<ng-container *transloco="let t; prefix: 'dialogs.quotes'">
+  <div class="dialog-header">
+    <h2 mat-dialog-title>{{ t('title') }}</h2>
+    <button mat-flat-button color="primary" (click)="openAddQuoteDialog()">
+      <mat-icon>add</mat-icon>
+      {{ t('addTitle') }}
+    </button>
+  </div>
+
+  <mat-dialog-content class="quotes-list-content">
+    @if (loading()) {
+      <div class="loading-container">
+        <mat-progress-spinner mode="indeterminate" diameter="40"></mat-progress-spinner>
+      </div>
+    } @else {
+      @if (quotes().length === 0) {
+        <div class="no-quotes" *transloco="let bd; prefix: 'bookDetails'">
+          {{ bd('noQuotes') }}
+        </div>
+      } @else {
+        <div class="quotes-list">
+          @for (quote of quotes(); track quote.id) {
+            <div class="quote-card">
+              <div class="quote-actions">
+                <button mat-icon-button (click)="editQuote(quote)" [matTooltip]="t('editTitle')">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" (click)="deleteQuote(quote)" [matTooltip]="t('deleteConfirm')">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+              <div class="quote-content">
+                <mat-icon class="quote-icon">format_quote</mat-icon>
+                <p class="quote-text">{{ quote.text }}</p>
+              </div>
+              @if (quote.page) {
+                <div class="quote-page" *transloco="let bd; prefix: 'bookDetails'">
+                  {{ bd('pageLabel', { page: quote.page }) }}
+                </div>
+              }
+              @if (quote.comment) {
+                <div class="quote-comment">
+                  <mat-icon>comment</mat-icon>
+                  <p>{{ quote.comment }}</p>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" *transloco="let c; prefix: 'common'">
+    <button mat-button (click)="dialogRef.close()">{{ c('close') }}</button>
+  </mat-dialog-actions>
+</ng-container>
