@@ -1,0 +1,30 @@
+<ng-container *transloco="let t; prefix: 'dialogs.quotes'">
+  <h2 mat-dialog-title>{{ isEditMode ? t('editTitle') : t('addTitle') }}</h2>
+  <mat-dialog-content>
+    <form [formGroup]="form" class="quote-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ t('textLabel') }}</mat-label>
+        <textarea matInput formControlName="text" rows="5" [placeholder]="t('textPlaceholder')"></textarea>
+        @if (form.get('text')?.hasError('required')) {
+          <mat-error>Text is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ t('pageLabel') }}</mat-label>
+        <input matInput formControlName="page" [placeholder]="t('pagePlaceholder')">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>{{ t('commentLabel') }}</mat-label>
+        <textarea matInput formControlName="comment" rows="3" [placeholder]="t('commentPlaceholder')"></textarea>
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end" *transloco="let c; prefix: 'common'">
+    <button mat-button (click)="onCancel()">{{ c('cancel') }}</button>
+    <button mat-flat-button color="primary" (click)="onSave()" [disabled]="form.invalid || saving">
+      {{ c('save') }}
+    </button>
+  </mat-dialog-actions>
+</ng-container>

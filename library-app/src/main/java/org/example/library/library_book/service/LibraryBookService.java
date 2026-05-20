@@ -8,24 +8,20 @@ import org.example.library.book.domain.BookStatus;
 import org.example.library.book.dto.LanguageWithCount;
 import org.example.library.book.repository.BookRepository;
 import org.example.library.category.repository.CategoryRepository;
-import org.example.library.collection_book.repository.CollectionBookRepository;
-import org.example.library.exception.BadRequestException;
-import org.example.library.exception.NotFoundException;
+import org.example.library.common.exception.BadRequestException;
+import org.example.library.common.exception.NotFoundException;
+import org.example.library.common.pagination.PageRequestBuilder;
+import org.example.library.common.pagination.PaginationParams;
+import org.example.library.common.pagination.SortableFields;
 import org.example.library.library_book.domain.LibraryBook;
 import org.example.library.library_book.domain.LibraryBookStatus;
 import org.example.library.library_book.domain.LibraryBookView;
-import org.example.library.library_book.dto.CreateLocalBookDto;
-import org.example.library.library_book.dto.LibraryBookDto;
-import org.example.library.library_book.dto.LibraryBookSearchCriteria;
-import org.example.library.library_book.dto.UpdateLibraryBookDetailsDto;
-import org.example.library.library_book.dto.UpdateLocalBookDto;
+import org.example.library.library_book.dto.*;
 import org.example.library.library_book.mapper.LibraryBookMapper;
 import org.example.library.library_book.repository.LibraryBookRepository;
 import org.example.library.library_book.repository.LibraryBookViewRepository;
 import org.example.library.library_book.repository.LibraryBookViewSpecification;
-import org.example.library.pagination.PageRequestBuilder;
-import org.example.library.pagination.PaginationParams;
-import org.example.library.pagination.SortableFields;
+import org.example.library.recommendation.adapter.EmbeddingModelAdapter;
 import org.example.library.recommendation.event.UserProfileUpdatedEvent;
 import org.example.library.user.repository.UserRepository;
 import org.springframework.context.ApplicationEventPublisher;
@@ -49,7 +45,6 @@ public class LibraryBookService {
 
     private final LibraryBookRepository repository;
     private final LibraryBookViewRepository viewRepository;
-    private final CollectionBookRepository collectionBookRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final AuthorRepository authorRepository;
@@ -57,6 +52,7 @@ public class LibraryBookService {
     private final LibraryBookMapper mapper;
     private final PageRequestBuilder pageRequestBuilder;
     private final ApplicationEventPublisher eventPublisher;
+    private final EmbeddingModelAdapter embeddingModelAdapter;
 
 
     @Transactional(readOnly = true)
@@ -81,12 +77,12 @@ public class LibraryBookService {
         book.setOwner(userRepository.getReferenceById(userId));
         book.setStatus(BookStatus.NEW);
         book.setPopularityCount(0);
-
-        if (dto.getCategoryId() != null) {
+        boolean hasCategory = dto.getCategoryId() != null;
+        if (hasCategory) {
             book.setCategory(categoryRepository.getReferenceById(dto.getCategoryId()));
         }
-
-        if (dto.getAuthorIds() != null && !dto.getAuthorIds().isEmpty()) {
+        boolean hasAuthors = dto.getAuthorIds() != null && !dto.getAuthorIds().isEmpty();
+        if (hasAuthors) {
             book.setAuthors(new HashSet<>(authorRepository.findAllById(dto.getAuthorIds())));
         }
 
@@ -207,18 +203,6 @@ public class LibraryBookService {
         log.info("[LIBRARY_BOOK_BULK_STATUS_UPDATE] User ID: {}, Library Book IDs: {}, Status: {}", userId, libraryBookIds, status);
     }
 
-    private void updateBookStatus(LibraryBook libraryBook, LibraryBookStatus status) {
-        var oldStatus = libraryBook.getStatus();
-
-        if (status == LibraryBookStatus.READ && oldStatus != LibraryBookStatus.READ) {
-            libraryBook.setFinishedAt(LocalDate.now());
-        } else if (status != LibraryBookStatus.READ && oldStatus == LibraryBookStatus.READ) {
-            libraryBook.setFinishedAt(null);
-        }
-
-        libraryBook.setStatus(status);
-    }
-
     @Transactional
     public LibraryBookDto updateLocalBook(Integer libraryBookId, UpdateLocalBookDto dto, Integer userId) {
         var libraryBook = repository.findByIdAndUserIdWithBook(libraryBookId, userId)
@@ -261,6 +245,16 @@ public class LibraryBookService {
     }
 
     @Transactional
+    public LibraryBookDto updateLocation(Integer libraryBookId, Integer userId, LocationDto dto) {
+        var libraryBook = getExistingById(libraryBookId, userId);
+        libraryBook.setLocation(dto.location());
+        repository.saveAndFlush(libraryBook);
+        var updatedView = getViewById(libraryBookId);
+        log.info("[LIBRARY_BOOK_LOCATION_UPDATE] User ID: {}, Library Book ID: {}, Location: {}", userId, libraryBookId, dto.location());
+        return mapper.toDto(updatedView);
+    }
+
+    @Transactional
     public LibraryBookDto updateDetails(Integer libraryBookId, Integer userId, UpdateLibraryBookDetailsDto dto) {
         var libraryBook = getExistingById(libraryBookId, userId);
         mapper.update(libraryBook, dto);
@@ -287,7 +281,6 @@ public class LibraryBookService {
         var libraryBook = repository.findByIdAndUserIdWithBook(libraryBookId, userId)
                 .orElseThrow(() -> new NotFoundException("error.library_book.not_found"));
         var book = libraryBook.getBook();
-        collectionBookRepository.deleteByLibraryBookIdAndUserId(libraryBookId, userId);
         repository.delete(libraryBook);
 
         if (book.getOwner() == null) {
@@ -307,7 +300,6 @@ public class LibraryBookService {
                 .map(lb -> lb.getBook().getId())
                 .toList();
 
-        collectionBookRepository.deleteAllByLibraryBookIdInAndUserId(libraryBookIds, userId);
         repository.deleteAll(libraryBooks);
 
         if (!globalBookIds.isEmpty()) {
@@ -315,6 +307,36 @@ public class LibraryBookService {
             eventPublisher.publishEvent(new UserProfileUpdatedEvent(userId));
         }
         log.info("[LIBRARY_BOOK_BULK_DELETE] User ID: {}, Library Book IDs: {}, Status: SUCCESS", userId, libraryBookIds);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LibraryBookDto> searchByMood(String query, LibraryBookStatus status, Integer userId, Integer limit) {
+        if (query == null || query.isBlank()) {
+            return List.of();
+        }
+
+        float[] queryVector = embeddingModelAdapter.embed(query);
+        var lang = LocaleContextHolder.getLocale().getLanguage();
+        int validatedLimit = (limit == null || limit <= 0) ? 10 : Math.min(limit, 50);
+        var statusStr = status != null ? status.name() : null;
+
+        var results = viewRepository.searchByMood(queryVector, lang, userId, statusStr, validatedLimit);
+
+        return results.stream()
+                .map(mapper::toDto)
+                .toList();
+    }
+
+    private void updateBookStatus(LibraryBook libraryBook, LibraryBookStatus status) {
+        var oldStatus = libraryBook.getStatus();
+
+        if (status == LibraryBookStatus.READ && oldStatus != LibraryBookStatus.READ) {
+            libraryBook.setFinishedAt(LocalDate.now());
+        } else if (status != LibraryBookStatus.READ && oldStatus == LibraryBookStatus.READ) {
+            libraryBook.setFinishedAt(null);
+        }
+
+        libraryBook.setStatus(status);
     }
 
     private void incrementPopularity(List<Integer> bookIds) {

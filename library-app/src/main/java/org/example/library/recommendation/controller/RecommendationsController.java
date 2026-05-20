@@ -51,4 +51,11 @@ public class RecommendationsController {
         return recommendationService.getSimilarBooks(bookId, userPrincipal.getId(), limit);
     }
 
+    @GetMapping("/search-by-mood")
+    public List<BookDto> searchByMood(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                      @RequestParam String query,
+                                      @RequestParam(required = false) Integer limit) {
+        return recommendationService.searchByMood(query, userPrincipal.getId(), limit);
+    }
+
 }

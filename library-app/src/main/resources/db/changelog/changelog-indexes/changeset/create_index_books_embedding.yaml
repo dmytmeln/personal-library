@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_index_books_embedding_hnsw
+      author: Dmytro Melnyk
+      changes:
+        - sql:
+            sql: CREATE INDEX idx_books_embedding_hnsw ON books USING hnsw (embedding vector_cosine_ops);

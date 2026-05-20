@@ -28,7 +28,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             FROM Category c
             JOIN c.translations tr ON tr.languageCode = :lang
             LEFT JOIN c.books b
-            WHERE (:name IS NULL OR LOWER(tr.name) LIKE LOWER(CONCAT('%', CAST(:name AS string), '%')))
+            WHERE (:name IS NULL OR (LOWER(tr.name) LIKE LOWER(CONCAT('%', CAST(:name AS string), '%')) OR FUNCTION('similarity', tr.name, CAST(:name AS string)) > 0.3))
             GROUP BY c.id, tr.name, tr.description, c.popularityCount
             HAVING (:booksCountMin IS NULL OR COUNT(b) >= :booksCountMin)
                AND (:booksCountMax IS NULL OR COUNT(b) <= :booksCountMax)
@@ -53,7 +53,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
             JOIN c.books b
             JOIN LibraryBook lb ON lb.book.id = b.id
             WHERE lb.user.id = :userId
-              AND (:name IS NULL OR LOWER(tr.name) LIKE LOWER(CONCAT('%', CAST(:name AS string), '%')))
+              AND (:name IS NULL OR (LOWER(tr.name) LIKE LOWER(CONCAT('%', CAST(:name AS string), '%')) OR FUNCTION('similarity', tr.name, CAST(:name AS string)) > 0.3))
             GROUP BY c.id, tr.name, tr.description, c.popularityCount
             HAVING (:booksCountMin IS NULL OR COUNT(DISTINCT lb.id) >= :booksCountMin)
                AND (:booksCountMax IS NULL OR COUNT(DISTINCT lb.id) <= :booksCountMax)

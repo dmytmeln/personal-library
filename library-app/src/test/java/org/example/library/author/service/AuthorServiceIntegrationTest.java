@@ -9,10 +9,10 @@ import org.example.library.author.repository.AuthorRepository;
 import org.example.library.book.domain.Book;
 import org.example.library.book.repository.BookRepository;
 import org.example.library.config.BaseIntegrationTest;
-import org.example.library.exception.NotFoundException;
+import org.example.library.common.exception.NotFoundException;
 import org.example.library.library_book.domain.LibraryBook;
 import org.example.library.library_book.repository.LibraryBookRepository;
-import org.example.library.pagination.PaginationParams;
+import org.example.library.common.pagination.PaginationParams;
 import org.example.library.user.domain.User;
 import org.example.library.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeAll;
@@ -92,9 +92,10 @@ class AuthorServiceIntegrationTest extends BaseIntegrationTest {
 
         var result = service.search(pagination, searchParams);
 
-        assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getFullName()).isEqualTo("Author 1");
-        assertThat(result.getContent().get(0).getBooksCount()).isEqualTo(2);
+        assertThat(result.getContent())
+                .hasSize(2)
+                .extracting("fullName")
+                .contains("Author 1", "Author 2");
     }
 
     @Test
@@ -123,6 +124,23 @@ class AuthorServiceIntegrationTest extends BaseIntegrationTest {
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getFullName()).isEqualTo("Auth 2");
         assertThat(result.getContent().get(0).getBooksCount()).isEqualTo(2);
+    }
+
+    @Test
+    void shouldFindAuthorWithTypo() {
+        saveAuthor("John Doe", "USA");
+        em.flush();
+        em.clear();
+        var pagination = new PaginationParams();
+        pagination.setPage(0);
+        pagination.setSize(10);
+        var searchParams = new AuthorSearchParams();
+        searchParams.setName("John Doee");
+
+        var result = service.search(pagination, searchParams);
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getFullName()).isEqualTo("John Doe");
     }
 
     @Test

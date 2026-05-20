@@ -25,7 +25,7 @@ public interface AuthorRepository extends JpaRepository<Author, Integer> {
             FROM Author a
             JOIN a.translations tr ON tr.languageCode = :lang
             LEFT JOIN a.books b
-            WHERE (:name IS NULL OR LOWER(tr.fullName) LIKE LOWER(CONCAT('%', CAST(:name AS string), '%')))
+            WHERE (:name IS NULL OR (LOWER(tr.fullName) LIKE LOWER(CONCAT('%', CAST(:name AS string), '%')) OR FUNCTION('similarity', tr.fullName, CAST(:name AS string)) > 0.3))
               AND (:country IS NULL OR LOWER(tr.country) = LOWER(CAST(:country AS string)))
               AND (:birthYearMin IS NULL OR a.birthYear >= :birthYearMin)
               AND (:birthYearMax IS NULL OR a.birthYear <= :birthYearMax)
@@ -69,7 +69,7 @@ public interface AuthorRepository extends JpaRepository<Author, Integer> {
             JOIN a.books b
             JOIN LibraryBook lb ON lb.book.id = b.id
             WHERE lb.user.id = :userId
-              AND (:name IS NULL OR LOWER(tr.fullName) LIKE LOWER(CONCAT('%', CAST(:name AS string), '%')))
+              AND (:name IS NULL OR (LOWER(tr.fullName) LIKE LOWER(CONCAT('%', CAST(:name AS string), '%')) OR FUNCTION('similarity', tr.fullName, CAST(:name AS string)) > 0.3))
               AND (:country IS NULL OR LOWER(tr.country) = LOWER(CAST(:country AS string)))
               AND (:birthYearMin IS NULL OR a.birthYear >= :birthYearMin)
               AND (:birthYearMax IS NULL OR a.birthYear <= :birthYearMax)

@@ -6,9 +6,9 @@ spring:
   jpa:
     properties:
       hibernate:
-        generate_statistics: true
-        show_sql: true
-        format_sql: true
+        generate_statistics: false
+        show_sql: false
+        format_sql: false
   liquibase:
     contexts: dev
 

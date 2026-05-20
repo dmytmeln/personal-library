@@ -1,7 +1,7 @@
 import {Injectable} from '@angular/core';
 import {ApiService} from './api.service';
 import {Observable} from 'rxjs';
-import {Note, NoteRequest} from '../interfaces/note';
+import {Note, NoteRequest, VoiceNoteResponse} from '../interfaces/note';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +22,13 @@ export class NoteService {
 
   delete(libraryBookId: number): Observable<void> {
     return this.api.delete(this.API_URL, { params: { libraryBookId } });
+  }
+
+  uploadVoiceNote(libraryBookId: number, audioBlob: Blob): Observable<VoiceNoteResponse> {
+    const formData = new FormData();
+    formData.append('audio', audioBlob, 'recording.webm');
+
+    return this.api.post(`${this.API_URL}/${libraryBookId}/voice`, { body: formData });
   }
 
 }

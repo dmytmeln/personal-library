@@ -89,6 +89,52 @@
       </div>
     }
 
+    @if (bookDetails.libraryBook) {
+      <div class="book-quotes-section">
+        <div class="section-header">
+          <h4>{{ t('quotes') }}</h4>
+          <button mat-flat-button color="primary" (click)="openAddQuoteDialog()">
+            <mat-icon>add</mat-icon>
+            {{ t('addQuote') }}
+          </button>
+        </div>
+
+        @if (quotes().length === 0) {
+          <div class="no-quotes-msg">{{ t('noQuotes') }}</div>
+        } @else {
+          <div class="quotes-grid">
+            @for (quote of quotes(); track quote.id) {
+              <div class="quote-card">
+                <div class="quote-actions">
+                  <button mat-icon-button (click)="editQuote(quote)" [matTooltip]="t('editQuote')">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="deleteQuote(quote)" [matTooltip]="t('deleteQuote')">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+                <div class="quote-content">
+                  <mat-icon class="quote-icon">format_quote</mat-icon>
+                  <p class="quote-text">{{ quote.text }}</p>
+                </div>
+                @if (quote.page) {
+                  <div class="quote-page">
+                    {{ t('pageLabel', { page: quote.page }) }}
+                  </div>
+                }
+                @if (quote.comment) {
+                  <div class="quote-comment">
+                    <mat-icon>comment</mat-icon>
+                    <p>{{ quote.comment }}</p>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
     @if (similarBooks().length > 0) {
       <div class="similar-books-section">
         <div class="section-header">

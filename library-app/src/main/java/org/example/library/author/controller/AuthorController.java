@@ -6,7 +6,7 @@ import org.example.library.author.dto.AuthorSearchParams;
 import org.example.library.author.dto.AuthorWithBooksCount;
 import org.example.library.author.dto.CountryWithCount;
 import org.example.library.author.service.AuthorService;
-import org.example.library.pagination.PaginationParams;
+import org.example.library.common.pagination.PaginationParams;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -17,13 +17,8 @@ databaseChangeLog:
                     referencedColumnNames: user_id
                     deleteCascade: true
               - column:
-                  name: vector
-                  type: vector(1100)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: version
-                  type: integer
+                  name: embedding
+                  type: vector(384)
                   constraints:
                     nullable: false
               - column:

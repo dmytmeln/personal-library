@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: create_table_quotes
+      author: Dmytro Melnyk
+      changes:
+        - createSequence:
+            sequenceName: quotes_seq
+            startValue: 1
+            incrementBy: 20
+        - createTable:
+            tableName: quotes
+            columns:
+              - column:
+                  name: quote_id
+                  type: integer
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: quotes_pk
+              - column:
+                  name: library_book_id
+                  type: integer
+                  constraints:
+                    nullable: false
+                    foreignKeyName: quotes_library_books_fk
+                    referencedTableName: library_books
+                    referencedColumnNames: library_book_id
+              - column:
+                  name: text
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: page
+                  type: varchar(50)
+              - column:
+                  name: comment
+                  type: text
+              - column:
+                  name: created_at
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp
+                  constraints:
+                    nullable: false

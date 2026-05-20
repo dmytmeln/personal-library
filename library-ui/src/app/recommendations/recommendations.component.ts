@@ -81,7 +81,6 @@ export class RecommendationsComponent implements OnInit {
     this.setupLanguageSubscription();
   }
 
-  // todo: duplicate code
   addBookToLibrary(book: Book): void {
     this.libraryBookService.addBook(book.id).subscribe({
       next: () => {
@@ -97,7 +96,6 @@ export class RecommendationsComponent implements OnInit {
     });
   }
 
-  // todo: duplicate code
   bulkAddBooks(): void {
     const ids = this.selection.selectedIds();
     this.libraryBookService.bulkAdd(ids).subscribe({

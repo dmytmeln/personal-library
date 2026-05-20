@@ -154,50 +154,75 @@
 
   <mat-menu #collectionBookMenu="matMenu">
     <ng-template matMenuContent let-libraryBook="libraryBook">
-      <button mat-menu-item (click)="openNoteDialog(libraryBook)">
-        <mat-icon>note_alt</mat-icon>
-        <span>{{ t('myNotes') }}</span>
-      </button>
-      @if (libraryBook.book.ownerId) {
-        <button mat-menu-item (click)="openUpdateLocalBookDialog(libraryBook)">
-          <mat-icon>edit</mat-icon>
-          <span>{{ t('editDetails') }}</span>
+      <ng-container *transloco="let m; prefix: 'library.menu'">
+        <button mat-menu-item (click)="openNoteDialog(libraryBook)">
+          <mat-icon>note_alt</mat-icon>
+          <span>{{ m('myNotes') }}</span>
         </button>
-      } @else {
-        <button mat-menu-item (click)="openEditDetailsDialog(libraryBook)">
-          <mat-icon>edit</mat-icon>
-          <span>{{ t('editDetails') }}</span>
+
+        <button mat-menu-item (click)="openQuotesDialog(libraryBook)">
+          <mat-icon>format_quote</mat-icon>
+          <span>{{ m('myQuotes') }}</span>
         </button>
-      }
-      <button mat-menu-item (click)="addToCollection(libraryBook)">
-        <mat-icon>playlist_add</mat-icon>
-        <span>{{ t('addToCollection') }}</span>
-      </button>
-      <button mat-menu-item (click)="moveBookToOtherCollection(libraryBook)">
-        <mat-icon>drive_file_move</mat-icon>
-        <span>{{ t('moveToOtherCollection') }}</span>
-      </button>
-      <button mat-menu-item [matMenuTriggerFor]="sharedMenu.statusMenu"
-              [matMenuTriggerData]="{ libraryBook: libraryBook }">
-        <mat-icon>label</mat-icon>
-        <span>{{ t('changeStatus') }}</span>
-      </button>
-      <button mat-menu-item [matMenuTriggerFor]="sharedMenu.ratingMenu"
-              [matMenuTriggerData]="{ libraryBook: libraryBook }">
-        <mat-icon>star</mat-icon>
-        <span>{{ t('rate') }}</span>
-      </button>
-      <button mat-menu-item (click)="removeFromAllCollections(libraryBook)">
-        <mat-icon>folder_delete</mat-icon>
-        <span>{{ t('removeFromAllCollections') }}</span>
-      </button>
-      <button mat-menu-item (click)="deleteBook(libraryBook)">
-        <mat-icon>remove_circle</mat-icon>
-        <span>{{ t('removeFromCollection') }}</span>
-      </button>
+
+        <button mat-menu-item [matMenuTriggerFor]="bookInfoMenu" [matMenuTriggerData]="{ libraryBook: libraryBook }">
+          <mat-icon>info</mat-icon>
+          <span>{{ m('bookInformation') }}</span>
+        </button>
+
+        <button mat-menu-item (click)="addToCollection(libraryBook)">
+          <mat-icon>playlist_add</mat-icon>
+          <span>{{ t('addToCollection') }}</span>
+        </button>
+        <button mat-menu-item (click)="moveBookToOtherCollection(libraryBook)">
+          <mat-icon>drive_file_move</mat-icon>
+          <span>{{ t('moveToOtherCollection') }}</span>
+        </button>
+        <button mat-menu-item [matMenuTriggerFor]="sharedMenu.statusMenu"
+                [matMenuTriggerData]="{ libraryBook: libraryBook }">
+          <mat-icon>label</mat-icon>
+          <span>{{ t('changeStatus') }}</span>
+        </button>
+        <button mat-menu-item [matMenuTriggerFor]="sharedMenu.ratingMenu"
+                [matMenuTriggerData]="{ libraryBook: libraryBook }">
+          <mat-icon>star</mat-icon>
+          <span>{{ t('rate') }}</span>
+        </button>
+        <button mat-menu-item (click)="removeFromAllCollections(libraryBook)">
+          <mat-icon>folder_delete</mat-icon>
+          <span>{{ t('removeFromAllCollections') }}</span>
+        </button>
+        <button mat-menu-item (click)="deleteBook(libraryBook)">
+          <mat-icon>remove_circle</mat-icon>
+          <span>{{ t('removeFromCollection') }}</span>
+        </button>
+      </ng-container>
     </ng-template>
   </mat-menu>
-</div>
+
+  <mat-menu #bookInfoMenu="matMenu">
+    <ng-template matMenuContent let-libraryBook="libraryBook">
+      <ng-container *transloco="let m; prefix: 'library.menu'">
+        @if (libraryBook.book.ownerId) {
+          <button mat-menu-item (click)="openUpdateLocalBookDialog(libraryBook)">
+            <mat-icon>edit</mat-icon>
+            <span>{{ m('editDetails') }}</span>
+          </button>
+        } @else {
+          <button mat-menu-item (click)="openEditDetailsDialog(libraryBook)">
+            <mat-icon>edit</mat-icon>
+            <span>{{ m('editDetails') }}</span>
+          </button>
+        }
+        <button mat-menu-item (click)="openLocationDialog(libraryBook)">
+          <mat-icon>location_on</mat-icon>
+          <span>{{ m('location') }}</span>
+        </button>
+      </ng-container>
+    </ng-template>
+  </mat-menu>
+  </div>
+
 
 <app-library-book-menu-items #sharedMenu
                              (statusChange)="statusChange($event)"

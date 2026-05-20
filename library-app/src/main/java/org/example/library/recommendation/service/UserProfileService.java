@@ -7,124 +7,123 @@ import org.example.library.library_book.domain.LibraryBookStatus;
 import org.example.library.library_book.repository.LibraryBookRepository;
 import org.example.library.recommendation.config.RecommendationProperties;
 import org.example.library.recommendation.domain.UserProfileVector;
-import org.example.library.recommendation.event.UserProfileUpdatedEvent;
 import org.example.library.recommendation.repository.UserProfileVectorRepository;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserProfileService {
 
+    private static final int EMBEDDING_SIZE = 384;
+
     private final LibraryBookRepository libraryBookRepository;
     private final UserProfileVectorRepository userProfileVectorRepository;
-    private final VocabularyMetadataService vocabularyMetadataService;
     private final RecommendationProperties properties;
 
+    @Transactional(readOnly = true)
+    public Optional<float[]> getUserProfileEmbedding(Integer userId) {
+        log.debug("Using saved user profile vector for user {}", userId);
 
-    @Transactional
-    public float[] calculateUserProfileVector(Integer userId) {
-        var metadata = vocabularyMetadataService.getMetadata();
-        int currentVersion = metadata.getCurrentVersion();
-
-        var storedVector = userProfileVectorRepository.findById(userId);
-
-        if (storedVector.isPresent() && storedVector.get().getVersion() == currentVersion) {
-            log.debug("Using saved user profile vector for user {} (version {})", userId, currentVersion);
-            return storedVector.get().getVector();
-        }
-
-        log.info("Stored vector for user {} is missing or outdated. Recalculating...", userId);
-        return calculateAndSaveVector(userId, currentVersion);
+        return userProfileVectorRepository.findById(userId)
+                .map(UserProfileVector::getEmbedding);
     }
-
 
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    public void onUserProfileUpdated(UserProfileUpdatedEvent event) {
-        log.info("Asynchronously rebuilding user profile vector for user {}", event.userId());
-        var metadata = vocabularyMetadataService.getMetadata();
-        calculateAndSaveVector(event.userId(), metadata.getCurrentVersion());
-    }
+    public void rebuildUserProfileVector(Integer userId) {
+        log.info("Rebuilding user profile vector for user {}", userId);
+        userProfileVectorRepository.deleteById(userId);
 
-    private float[] calculateAndSaveVector(Integer userId, int version) {
-        float[] vector = performCalculation(userId);
-
-        if (vector != null) {
-            var userProfileVector = UserProfileVector.builder()
-                    .userId(userId)
-                    .vector(vector)
-                    .version(version)
-                    .updatedAt(LocalDateTime.now())
-                    .build();
-            userProfileVectorRepository.save(userProfileVector);
-            log.debug("Saved user profile vector for user {}", userId);
-        } else {
-            userProfileVectorRepository.deleteById(userId);
-            log.debug("Deleted user profile vector for user {} due to no valid data", userId);
-        }
-
-        return vector;
-    }
-
-    private float[] performCalculation(Integer userId) {
-        var userLibrary = libraryBookRepository.findAllWithVectorsByUserId(userId);
-
+        List<LibraryBook> userLibrary = libraryBookRepository.findAllWithVectorsByUserId(userId);
         if (userLibrary.isEmpty()) {
-            log.warn("User {} has no books with vectors. Returning null.", userId);
-            return null;
+            log.debug("No books found for user {}, skipping profile rebuild", userId);
+            return;
         }
 
-        int vectorSize = properties.getTotalVectorSize();
-        var combinedVector = new float[vectorSize];
+        float[] vector = calculateUserProfileVector(userLibrary);
+        var userProfileVector = UserProfileVector.builder()
+                .userId(userId)
+                .embedding(vector)
+                .updatedAt(LocalDateTime.now())
+                .build();
+
+        userProfileVectorRepository.save(userProfileVector);
+        log.debug("Persisted profile vector for user {}", userId);
+    }
+
+    private float[] calculateUserProfileVector(List<LibraryBook> userLibrary) {
+        float[] accumulatedVector = new float[EMBEDDING_SIZE];
         float totalWeight = 0.0f;
 
         for (LibraryBook lb : userLibrary) {
-            float weight = determineWeight(lb);
-            float recencyFactor = calculateRecencyFactor(lb.getAddedAt());
-            float finalWeight = weight * recencyFactor;
-
-            var bookVector = lb.getBook().getDescriptionVector();
-
-            if (bookVector == null || bookVector.length != vectorSize) continue;
-
-            for (int i = 0; i < vectorSize; i++) {
-                combinedVector[i] += bookVector[i] * finalWeight;
+            float[] bookEmbedding = lb.getBook().getEmbedding();
+            if (bookEmbedding.length != EMBEDDING_SIZE) {
+                log.error("Invalid book embedding length for book {}. Skipping.", lb.getBook().getId());
+                continue;
             }
-            totalWeight += Math.abs(finalWeight);
+            float bookWeight = calculateBookWeight(lb);
+
+            accumulateBookWeightedEmbedding(accumulatedVector, bookEmbedding, bookWeight);
+
+            totalWeight += Math.abs(bookWeight);
         }
 
-        if (totalWeight > 0) {
-            for (int i = 0; i < vectorSize; i++) {
-                combinedVector[i] /= totalWeight;
-            }
+        return computeWeightedAverageVector(accumulatedVector, totalWeight);
+    }
+
+    private void accumulateBookWeightedEmbedding(float[] accumulatedVector, float[] bookEmbedding, float bookWeight) {
+        for (int i = 0; i < EMBEDDING_SIZE; i++) {
+            float bookWeightedEmbeddingDimension = bookEmbedding[i] * bookWeight;
+            accumulatedVector[i] += bookWeightedEmbeddingDimension;
+        }
+    }
+
+    private float[] computeWeightedAverageVector(float[] userProfileVector, float totalWeight) {
+        if (totalWeight <= 0) {
+            return userProfileVector;
         }
 
-        return combinedVector;
+        float[] weightedAverage = new float[EMBEDDING_SIZE];
+        for (int i = 0; i < EMBEDDING_SIZE; i++) {
+            weightedAverage[i] = userProfileVector[i] / totalWeight;
+        }
+
+        return weightedAverage;
+    }
+
+    private float calculateBookWeight(LibraryBook lb) {
+        float weight = determineBookWeight(lb.getStatus(), lb.getRating());
+        float recencyFactor = calculateRecencyFactor(lb.getAddedAt());
+
+        return weight * recencyFactor;
     }
 
     private float calculateRecencyFactor(LocalDateTime addedAt) {
-        if (addedAt == null) return 1.0f;
+        if (addedAt == null) {
+            return 1.0f;
+        }
 
-        long monthsPassed = ChronoUnit.MONTHS.between(addedAt, LocalDateTime.now());
-        return (float) Math.exp(-properties.getRecencyDecayFactor() * monthsPassed);
+        long monthsSinceAddingPassed = ChronoUnit.MONTHS.between(addedAt, LocalDateTime.now());
+        return (float) Math.exp(-properties.getRecencyDecayFactor() * monthsSinceAddingPassed);
     }
 
-    private float determineWeight(LibraryBook lb) {
-        if (LibraryBookStatus.FAVORITE == lb.getStatus()) return properties.getFavoriteWeight();
+    private float determineBookWeight(LibraryBookStatus libraryBookStatus, Byte rating) {
+        if (LibraryBookStatus.FAVORITE == libraryBookStatus) {
+            return properties.getFavoriteWeight();
+        }
 
-        Byte rating = lb.getRating();
-        if (rating == null) return properties.getNoRatingWeight();
-
+        if (rating == null) {
+            return properties.getNoRatingWeight();
+        }
         return switch (rating) {
             case 5 -> properties.getRating5Weight();
             case 4 -> properties.getRating4Weight();

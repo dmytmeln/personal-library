@@ -1,0 +1,142 @@
+I want to implement the following functionality:
+Voice thought:
+    → transcription
+    → AI cleanup/formatting
+    → structured book note
+Whisper handles transcription
+LLM handles note quality
+
+Architecture:
+Angular SPA
+    ↓
+record audio (webm/opus)
+    ↓
+Spring Boot REST API
+    ↓
+Groq Whisper (transcription)
+    ↓
+LLM formatting/cleanup
+    ↓
+save transcript + formatted note
+
+Frontend (Angular)
+Use MediaRecorder API
+Record:
+audio/webm;codecs=opus
+
+Enable Browser Audio Enhancements
+
+VERY important:
+
+navigator.mediaDevices.getUserMedia({
+  audio: {
+    channelCount: 1,
+    echoCancellation: true,
+    noiseSuppression: true,
+    autoGainControl: true
+  }
+});
+
+Recording UX
+Record short thoughts:
+30–90 seconds
+Hard limit:
+3 minutes
+Do NOT implement realtime streaming initially.
+
+Instead:
+record
+→ stop
+→ upload
+→ process
+
+This gives better transcription quality and much simpler architecture.
+
+Upload Strategy
+Send audio as:
+multipart/form-data
+
+Backend (Spring Boot)
+Important:
+Do NOT Store Audio Files
+Backend should:
+receive audio
+immediately forward to Groq
+discard audio afterward
+No permanent storage needed.
+
+Backend Processing Flow
+MultipartFile
+→ send to Groq Whisper (using langchain4j)
+→ receive transcript
+→ send transcript to LLM (gemiin 3.1 flash-lite )
+→ save text results only
+set auth token, model, url in properties (app.ai.groq.[properties], app.ai.gemini.[properties])
+
+Whisper Configuration
+Use:
+whisper-large-v3-turbo
+
+Whisper Request Parameters
+Recommended:
+model=whisper-large-v3-turbo
+language=<take from localecontextholder>
+temperature=0
+
+What To Save In DB
+Recommended schema (change existing migration - it is ok since I dont have prod DB)
+Note
+  id
+  library_book_id
+  type (TEXT, VOICE)
+  raw_transcript (only for VOICE type)
+  note (for text type - user text, for voice type - AI formatted text)
+  created_at
+  transcription_model (only for VOICE type)
+  formatting_model (only for VOICE type)
+
+Book Context
+When formatting notes:
+provide current book title
+author
+description
+This improves:
+names
+terminology
+concept recognition
+
+Recommended Cleanup Prompt
+Your formatter should behave like:
+an itelligent editor
+
+NOT:
+a summarizer
+a co-author
+Rules:
+preserve meaning
+remove filler words
+improve grammar
+structure text
+do not invent information
+
+Recommended User Flow
+User opens library book note (NoteDialogComponent)
+→ taps microphone
+→ records thought
+→ uploads audio
+→ sees:
+    - raw transcript
+    - polished note
+→ saves note
+
+Things You SHOULD NOT Build Initially
+
+Avoid:
+
+realtime transcription
+websocket streaming
+ffmpeg preprocessing
+silence detection
+advanced VAD
+permanent audio storage
+aggressive AI summarization

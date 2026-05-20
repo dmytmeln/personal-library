@@ -27,6 +27,7 @@ import {CollectionBookService} from '../services/collection-book.service';
 import {LibraryBookService} from '../services/library-book.service';
 import {ViewBookListDialog, ViewBookListDialogData} from '../dialogs/view-book-list-dialog/view-book-list-dialog';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
+import {MAX_COLLECTION_BOOKS} from '../common/constants';
 
 @Component({
   selector: 'app-collections',
@@ -120,7 +121,8 @@ export class CollectionsComponent implements OnInit {
       data: {
         message,
         confirmLabel: 'common.delete'
-      }
+      },
+      width: '550px'
     });
 
     dialogRef.afterClosed().pipe(filter(Boolean)).subscribe(() => {
@@ -188,10 +190,9 @@ export class CollectionsComponent implements OnInit {
   }
 
   openAddBookDialog(node: CollectionNode): void {
-    // todo fix (get books by collection)
-    this.collectionService.getById(node.id).subscribe(collection => {
+    this.collectionBookService.getCollectionBooks(node.id, {size: MAX_COLLECTION_BOOKS}).subscribe(page => {
       const data: ViewBookListDialogData = {
-        libraryBooks: collection.books.map(cd => cd.libraryBook), // todo fix (books undefined)
+        libraryBooks: page.content || [],
         categoryColumn: 'categoryName',
         fetchBooksFn: (options) => this.libraryBookService.getAll(options),
       };

@@ -12,7 +12,7 @@ import org.example.library.category.domain.Category;
 import org.example.library.category.domain.CategoryTranslation;
 import org.example.library.category.repository.CategoryRepository;
 import org.example.library.config.BaseIntegrationTest;
-import org.example.library.exception.NotFoundException;
+import org.example.library.common.exception.NotFoundException;
 import org.example.library.library_book.domain.LibraryBook;
 import org.example.library.library_book.repository.LibraryBookRepository;
 import org.example.library.user.domain.User;

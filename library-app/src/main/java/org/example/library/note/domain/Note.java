@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.example.library.library_book.domain.LibraryBook;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -24,8 +26,25 @@ public class Note {
     @Column(name = "note_id")
     private Integer id;
 
-    @Column(name = "content", nullable = false, columnDefinition = "text")
+    @Column(name = "content", nullable = true, columnDefinition = "text")
     private String content;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "note_type", nullable = false, length = 20)
+    @Builder.Default
+    private NoteType noteType = NoteType.TEXT;
+
+    @Column(name = "raw_transcript", nullable = true, columnDefinition = "text")
+    private String rawTranscript;
+
+    @Column(name = "transcription_model", nullable = true)
+    private String transcriptionModel;
+
+    @Column(name = "formatting_model", nullable = true)
+    private String formattingModel;
+
+    @Column(name = "voice_created_at", nullable = true)
+    private LocalDateTime voiceCreatedAt;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -37,12 +56,17 @@ public class Note {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "library_book_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private LibraryBook libraryBook;
+
+    public enum NoteType {
+        TEXT, VOICE
+    }
 
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Note note)) return false;
-        return Objects.equals(id, note.getId());
+        return Objects.equals(id, note.id);
     }
 
     @Override

@@ -37,11 +37,17 @@ export class ApiService {
   }
 
   private getRequestOptions(data: any) {
-    const headers = new HttpHeaders(Object.assign({}, this.headers));
+    let headers = new HttpHeaders(Object.assign({}, this.headers));
+
+    if (data.headers) {
+      Object.keys(data.headers).forEach(key => {
+        headers = headers.set(key, data.headers[key]);
+      });
+    }
 
     return {
       params: data.params ? data.params : {},
-      headers: Object.assign(headers, data.headers ? data.headers : {}),
+      headers,
       withCredentials: true
     };
   }

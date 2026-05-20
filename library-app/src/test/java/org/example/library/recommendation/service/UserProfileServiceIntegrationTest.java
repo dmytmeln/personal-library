@@ -11,10 +11,8 @@ import org.example.library.config.BaseIntegrationTest;
 import org.example.library.library_book.domain.LibraryBook;
 import org.example.library.library_book.domain.LibraryBookStatus;
 import org.example.library.library_book.repository.LibraryBookRepository;
-import org.example.library.recommendation.domain.VocabularyMetadata;
 import org.example.library.recommendation.event.UserProfileUpdatedEvent;
 import org.example.library.recommendation.repository.UserProfileVectorRepository;
-import org.example.library.recommendation.repository.VocabularyMetadataRepository;
 import org.example.library.user.domain.User;
 import org.example.library.user.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -24,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.time.LocalDateTime;
@@ -34,6 +33,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+@TestPropertySource(properties = "library.recommendation.profile-rebuild-debounce=PT1S")
 class UserProfileServiceIntegrationTest extends BaseIntegrationTest {
 
     @Autowired
@@ -55,9 +55,6 @@ class UserProfileServiceIntegrationTest extends BaseIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
-    private VocabularyMetadataRepository metadataRepository;
-
-    @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     @Autowired
@@ -66,10 +63,12 @@ class UserProfileServiceIntegrationTest extends BaseIntegrationTest {
     private User testUser;
     private Category defaultCategory;
 
+
     @BeforeAll
     static void setUpAll() {
         LocaleContextHolder.setLocale(Locale.ENGLISH);
     }
+
 
     @BeforeEach
     void setUp() {
@@ -88,13 +87,6 @@ class UserProfileServiceIntegrationTest extends BaseIntegrationTest {
         translation.setCategory(defaultCategory);
 
         categoryRepository.save(defaultCategory);
-
-        if (metadataRepository.findById(VocabularyMetadataService.METADATA_ID).isEmpty()) {
-            metadataRepository.save(VocabularyMetadata.builder()
-                    .id(VocabularyMetadataService.METADATA_ID)
-                    .currentVersion(1)
-                    .build());
-        }
     }
 
     @AfterEach
@@ -104,37 +96,12 @@ class UserProfileServiceIntegrationTest extends BaseIntegrationTest {
         bookRepository.deleteAll();
         categoryRepository.deleteAll();
         userRepository.deleteAll();
-        metadataRepository.deleteAll();
-    }
-
-
-    @Test
-    void shouldCalculateAndSaveUserProfileVector() {
-        var book = saveBook("Java Book", new float[1100]);
-        book.getDescriptionVector()[0] = 1.0f;
-        bookRepository.save(book);
-        var lb = LibraryBook.builder()
-                .user(testUser)
-                .book(book)
-                .status(LibraryBookStatus.FAVORITE)
-                .addedAt(LocalDateTime.now())
-                .build();
-        libraryBookRepository.save(lb);
-
-        var vector = userProfileService.calculateUserProfileVector(testUser.getId());
-
-        assertThat(vector).isNotNull();
-        assertThat(vector).hasSize(1100);
-        var savedVector = userProfileVectorRepository.findById(testUser.getId());
-        assertThat(savedVector).isPresent();
-        assertThat(savedVector.get().getVector()).isEqualTo(vector);
-        assertThat(savedVector.get().getVersion()).isEqualTo(1);
     }
 
     @Test
     void shouldAsynchronouslyRebuildVectorOnEventAfterCommit() {
-        var book = saveBook("Java Book", new float[1100]);
-        book.getDescriptionVector()[0] = 1.0f;
+        var book = saveBook("Java Book", new float[384]);
+        book.getEmbedding()[0] = 1.0f;
         bookRepository.save(book);
 
         transactionTemplate.executeWithoutResult(status -> {
@@ -149,42 +116,54 @@ class UserProfileServiceIntegrationTest extends BaseIntegrationTest {
             eventPublisher.publishEvent(new UserProfileUpdatedEvent(testUser.getId()));
         });
 
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
-            var savedVector = userProfileVectorRepository.findById(testUser.getId());
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+            var savedVector = userProfileService.getUserProfileEmbedding(testUser.getId());
             assertThat(savedVector).isPresent();
-            assertThat(savedVector.get().getVector()[0]).isGreaterThan(0.0f);
-            assertThat(savedVector.get().getVersion()).isEqualTo(1);
+            assertThat(savedVector.get()[0]).isGreaterThan(0.0f);
         });
     }
+
     @Test
     void shouldDeleteVectorOnEventWhenLibraryIsEmpty() {
-        var book = saveBook("Java Book", new float[1100]);
-        book.getDescriptionVector()[0] = 1.0f;
+        var book = saveBook("Java Book", new float[384]);
+        book.getEmbedding()[0] = 1.0f;
         bookRepository.save(book);
-        libraryBookRepository.save(LibraryBook.builder().user(testUser).book(book).status(LibraryBookStatus.READING).addedAt(LocalDateTime.now()).build());
-        userProfileService.calculateUserProfileVector(testUser.getId());
-        assertThat(userProfileVectorRepository.findById(testUser.getId())).isPresent();
+
+        transactionTemplate.executeWithoutResult(status -> {
+            var lb = LibraryBook.builder()
+                    .user(testUser)
+                    .book(book)
+                    .status(LibraryBookStatus.READING)
+                    .addedAt(LocalDateTime.now())
+                    .build();
+            libraryBookRepository.save(lb);
+            eventPublisher.publishEvent(new UserProfileUpdatedEvent(testUser.getId()));
+        });
+
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
+            assertThat(userProfileService.getUserProfileEmbedding(testUser.getId())).isPresent();
+        });
 
         transactionTemplate.executeWithoutResult(status -> {
             libraryBookRepository.deleteAll();
             eventPublisher.publishEvent(new UserProfileUpdatedEvent(testUser.getId()));
         });
 
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(10, TimeUnit.SECONDS).untilAsserted(() -> {
             var savedVector = userProfileVectorRepository.findById(testUser.getId());
             assertThat(savedVector).isEmpty();
         });
     }
 
-
-    private Book saveBook(String title, float[] descriptionVector) {
+    private Book saveBook(String title, float[] embedding) {
         var book = Book.builder()
                 .category(defaultCategory)
                 .publishYear((short) 2020)
+                .pages((short) 100)
+                .coverImageUrl("url")
                 .popularityCount(0)
                 .status(BookStatus.SYNCED)
-                .vectorVersion(1)
-                .descriptionVector(descriptionVector)
+                .embedding(embedding)
                 .build();
         var translation = BookTranslation.builder()
                 .languageCode("en")

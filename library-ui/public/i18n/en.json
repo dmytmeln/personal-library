@@ -42,6 +42,8 @@
     "from": "From",
     "to": "To",
     "pagesShort": "p.",
+    "selectedCount": "Selected: {{count}}",
+    "cancelSelection": "Cancel selection",
     "viewMode": "View Mode",
     "selectPage": "Select page",
     "confirmDelete": "Are you sure you want to delete this item? This action cannot be undone.",
@@ -74,6 +76,18 @@
       "title": "Book Notes",
       "label": "Your note",
       "placeholder": "Write something..."
+    },
+    "quotes": {
+      "title": "Book Quotes",
+      "addTitle": "Add Quote",
+      "editTitle": "Edit Quote",
+      "textLabel": "Quote Text",
+      "textPlaceholder": "Enter the quote text...",
+      "pageLabel": "Page / Chapter",
+      "pagePlaceholder": "e.g. 42 or Chapter 3",
+      "commentLabel": "Your Comment",
+      "commentPlaceholder": "Add your thoughts about this quote...",
+      "deleteConfirm": "Are you sure you want to delete this quote?"
     },
     "viewBookList": {
       "title": "Select a book!",
@@ -112,6 +126,11 @@
       },
       "resetButton": "Reset to Defaults"
     },
+    "location": {
+      "title": "Physical Location",
+      "label": "Location",
+      "placeholder": "e.g. Living room, shelf 2, top row"
+    },
     "createLocalBook": {
       "title": "Create Manual Book",
       "fields": {
@@ -145,10 +164,21 @@
     "tabs": {
       "allBooks": "All Books",
       "authors": "Authors",
-      "categories": "Categories"
+      "categories": "Categories",
+      "moodSearch": "Mood Search"
+    },
+    "moodSearch": {
+      "label": "Search by mood in your library",
+      "placeholder": "e.g. something inspiring for the evening",
+      "button": "Find in Library",
+      "onlyToRead": "Only in 'Want to read'",
+      "hint": "AI search helps you find the right book among yours based on your description.",
+      "noResults": "No books found in your library for this description.",
+      "searching": "Searching your library..."
     },
     "filters": {
       "bookTitle": "Book Title",
+      "location": "Location",
       "status": "Status",
       "author": "Author",
       "category": "Category",
@@ -174,7 +204,10 @@
     },
     "menu": {
       "bookDetails": "Book Details",
+      "bookInformation": "Book Information",
+      "location": "Physical Location",
       "myNotes": "My Notes",
+      "myQuotes": "My Quotes",
       "editDetails": "Edit Details",
       "addToCollection": "Add to Collection",
       "addToLibrary": "Add to Library",
@@ -198,7 +231,9 @@
       "detailsUpdated": "Book details updated",
       "bookAdded": "Book added to library",
       "noteSaved": "Note saved",
-      "noteDeleted": "Note deleted"
+      "noteDeleted": "Note deleted",
+      "quoteSaved": "Quote saved",
+      "quoteDeleted": "Quote deleted"
     },
     "statuses": {
       "TO_READ": "Want to read",
@@ -302,7 +337,13 @@
     "description": "Description",
     "addToLibrary": "Add to Library",
     "noDescription": "No description available",
-    "similarBooks": "Similar books"
+    "similarBooks": "Similar books",
+    "quotes": "Quotes",
+    "addQuote": "Add Quote",
+    "noQuotes": "No quotes added yet.",
+    "editQuote": "Edit Quote",
+    "deleteQuote": "Delete Quote",
+    "pageLabel": "p. {{page}}"
   },
   "profile": {
     "title": "User Profile",
@@ -325,7 +366,16 @@
     "tabs": {
       "allBooks": "All Books",
       "authors": "Authors",
-      "categories": "Categories"
+      "categories": "Categories",
+      "moodSearch": "Mood Search"
+    },
+    "moodSearch": {
+      "label": "Describe your mood or what the book should be about",
+      "placeholder": "e.g. science fiction about time travel and artificial intelligence",
+      "button": "Search with AI",
+      "hint": "AI search finds books by meaning, not just by title keywords.",
+      "noResults": "No books found for this description. Try another one!",
+      "searching": "Analyzing your mood..."
     },
     "filters": {
       "bookTitle": "Book Title",

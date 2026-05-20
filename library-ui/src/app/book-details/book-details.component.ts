@@ -21,7 +21,12 @@ import {BookListItemComponent} from '../book-list-item/book-list-item.component'
 import {BulkActionBarComponent} from '../common/bulk-action-bar/bulk-action-bar.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {MatMenuModule} from '@angular/material/menu';
-import {skip} from 'rxjs';
+import {filter, skip} from 'rxjs';
+import {QuoteService} from '../services/quote.service';
+import {Quote} from '../interfaces/quote';
+import {MatDialog} from '@angular/material/dialog';
+import {QuoteFormDialogComponent} from '../dialogs/quote-form-dialog/quote-form-dialog.component';
+import {ConfirmationDialogComponent} from '../dialogs/confirmation-dialog/confirmation-dialog.component';
 
 @Component({
   selector: 'app-book-details',
@@ -51,6 +56,7 @@ export class BookDetailsComponent implements OnInit {
   bookId!: number;
   bookDetails?: BookDetails;
   similarBooks = signal<Book[]>([]);
+  quotes = signal<Quote[]>([]);
   viewMode = signal<'grid' | 'list'>('grid');
   readonly selection = new SelectionStore();
   private libraryBookIds: Set<number> = new Set<number>();
@@ -61,8 +67,10 @@ export class BookDetailsComponent implements OnInit {
     private bookService: BookService,
     private libraryBookService: LibraryBookService,
     private recommendationService: RecommendationService,
+    private quoteService: QuoteService,
     matSnackBar: MatSnackBar,
     private translocoService: TranslocoService,
+    private dialog: MatDialog,
   ) {
     this.snackCommon = new MatSnackCommon(matSnackBar);
   }
@@ -126,7 +134,6 @@ export class BookDetailsComponent implements OnInit {
   }
 
   bulkAddSimilarBooks(): void {
-    // todo duplicate code
     const ids = this.selection.selectedIds();
     this.libraryBookService.bulkAdd(ids).subscribe({
       next: () => {
@@ -180,6 +187,64 @@ export class BookDetailsComponent implements OnInit {
   private loadBookDetails(): void {
     this.bookService.getBookDetails(this.bookId).subscribe(bookDetails => {
       this.bookDetails = bookDetails;
+      this.loadQuotes();
+    });
+  }
+
+  private loadQuotes(): void {
+    const libraryBookId = this.bookDetails?.libraryBook?.id;
+    if (libraryBookId) {
+      this.quoteService.getByLibraryBookId(libraryBookId).subscribe(quotes => {
+        this.quotes.set(quotes);
+      });
+    } else {
+      this.quotes.set([]);
+    }
+  }
+
+  openAddQuoteDialog(): void {
+    const libraryBookId = this.bookDetails?.libraryBook?.id;
+    if (!libraryBookId) return;
+
+    const dialogRef = this.dialog.open(QuoteFormDialogComponent, {
+      data: { libraryBookId },
+      width: '500px'
+    });
+
+    dialogRef.afterClosed().pipe(filter(Boolean)).subscribe(() => {
+      this.loadQuotes();
+      this.snackCommon.showSuccess(this.translocoService.translate('library.success.quoteSaved'));
+    });
+  }
+
+  editQuote(quote: Quote): void {
+    const libraryBookId = this.bookDetails?.libraryBook?.id;
+    if (!libraryBookId) return;
+
+    const dialogRef = this.dialog.open(QuoteFormDialogComponent, {
+      data: { libraryBookId, quote },
+      width: '500px'
+    });
+
+    dialogRef.afterClosed().pipe(filter(Boolean)).subscribe(() => {
+      this.loadQuotes();
+      this.snackCommon.showSuccess(this.translocoService.translate('library.success.quoteSaved'));
+    });
+  }
+
+  deleteQuote(quote: Quote): void {
+    const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
+      data: {
+        message: this.translocoService.translate('dialogs.quotes.deleteConfirm'),
+        confirmLabel: 'common.delete'
+      }
+    });
+
+    dialogRef.afterClosed().pipe(filter(Boolean)).subscribe(() => {
+      this.quoteService.delete(quote.id).subscribe(() => {
+        this.loadQuotes();
+        this.snackCommon.showSuccess(this.translocoService.translate('library.success.quoteDeleted'));
+      });
     });
   }
 

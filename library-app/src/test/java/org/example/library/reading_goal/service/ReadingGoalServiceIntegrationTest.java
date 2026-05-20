@@ -3,7 +3,7 @@ package org.example.library.reading_goal.service;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.example.library.config.BaseIntegrationTest;
-import org.example.library.exception.NotFoundException;
+import org.example.library.common.exception.NotFoundException;
 import org.example.library.reading_goal.domain.ReadingGoal;
 import org.example.library.reading_goal.dto.ReadingGoalDto;
 import org.example.library.reading_goal.repository.ReadingGoalRepository;

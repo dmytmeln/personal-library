@@ -13,7 +13,7 @@ import org.example.library.category.domain.Category;
 import org.example.library.category.domain.CategoryTranslation;
 import org.example.library.category.repository.CategoryRepository;
 import org.example.library.config.BaseIntegrationTest;
-import org.example.library.pagination.PaginationParams;
+import org.example.library.common.pagination.PaginationParams;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -92,6 +92,23 @@ class BookServiceIntegrationTest extends BaseIntegrationTest {
 
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getTitle()).isEqualTo("Spring in Action");
+    }
+
+    @Test
+    void shouldFindBookWithTypo() {
+        saveBook("The Great Gatsby", "English");
+        em.flush();
+        em.clear();
+        var pagination = new PaginationParams();
+        pagination.setPage(0);
+        pagination.setSize(10);
+        var searchParams = new BookSearchParams();
+        searchParams.setTitle("The Great Gatsbyy");
+
+        var result = service.getAll(pagination, searchParams);
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getTitle()).isEqualTo("The Great Gatsby");
     }
 
     @Test

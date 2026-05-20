@@ -130,6 +130,110 @@
   }
 }
 
+.book-quotes-section {
+  margin-top: 48px;
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+
+    h4 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 500;
+    }
+  }
+
+  .no-quotes-msg {
+    padding: 32px;
+    text-align: center;
+    background: var(--mat-sys-surface-container-highest);
+    border-radius: 8px;
+    font-style: italic;
+    color: var(--mat-sys-outline);
+  }
+
+  .quotes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .quote-card {
+    position: relative;
+    background: var(--mat-sys-surface-container-highest);
+    border-left: 4px solid var(--mat-sys-primary);
+    border-radius: 4px;
+    padding: 20px;
+    box-shadow: var(--mat-sys-level1);
+
+    .quote-actions {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    &:hover .quote-actions {
+      opacity: 1;
+    }
+
+    .quote-content {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+
+      .quote-icon {
+        color: var(--mat-sys-primary);
+        font-size: 24px;
+        height: 24px;
+        width: 24px;
+      }
+
+      .quote-text {
+        margin: 0;
+        font-size: 1.1rem;
+        font-style: italic;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+    }
+
+    .quote-page {
+      text-align: right;
+      font-size: 0.9rem;
+      color: var(--mat-sys-outline);
+      font-weight: 500;
+    }
+
+    .quote-comment {
+      margin-top: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--mat-sys-outline-variant);
+      display: flex;
+      gap: 8px;
+      color: var(--mat-sys-on-surface-variant);
+      font-size: 0.95rem;
+
+      mat-icon {
+        font-size: 18px;
+        height: 18px;
+        width: 18px;
+        margin-top: 2px;
+      }
+
+      p {
+        margin: 0;
+      }
+    }
+  }
+}
+
 .similar-books-section {
   margin-top: 48px;
 

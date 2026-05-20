@@ -19,6 +19,7 @@ export interface BaseBookFilters {
 export interface LibraryFilters extends BaseBookFilters {
   status: LibraryBookStatus | null;
   rating: Range<number>;
+  location: string;
 }
 
 export interface AuthorFilters {
