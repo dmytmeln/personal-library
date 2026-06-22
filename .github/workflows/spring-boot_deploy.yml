@@ -5,6 +5,7 @@ on:
     branches: [ "master" ]
     paths:
       - 'library-app/**'
+      - '.github/workflows/spring-boot_build.yml'
       - '.github/workflows/spring-boot_deploy.yml'
 
 jobs:
