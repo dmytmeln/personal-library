@@ -41,6 +41,9 @@ public class LibraryBookView {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "location")
+    private String location;
+
     @Column(name = "publish_year")
     private Short publishYear;
 

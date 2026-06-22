@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -29,5 +30,18 @@ public interface LibraryBookViewRepository extends JpaRepository<LibraryBookView
                 AND (v.languageCode = :languageCode OR v.languageCode IS NULL)
             """)
     Optional<LibraryBookView> findByBookIdAndUserIdAndLanguageCode(Integer bookId, Integer userId, String languageCode);
+
+    @Query(value = """
+            SELECT lbv.*
+            FROM library_books_view lbv
+            JOIN books b ON lbv.book_id = b.book_id
+            WHERE lbv.user_id = :userId
+              AND (lbv.language_code = :languageCode OR lbv.language_code IS NULL)
+              AND b.embedding IS NOT NULL
+              AND (:status IS NULL OR lbv.status = :status)
+            ORDER BY b.embedding <=> cast(:vector as vector)
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<LibraryBookView> searchByMood(float[] vector, String languageCode, Integer userId, String status, int limit);
 
 }

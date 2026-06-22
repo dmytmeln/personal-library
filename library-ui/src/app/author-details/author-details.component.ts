@@ -113,7 +113,6 @@ export class AuthorDetailsComponent implements OnInit {
     this.loadBooks();
   }
 
-  // todo duplicate code
   addBookToLibrary(book: Book): void {
     this.libraryBookService.addBook(book.id).subscribe({
       next: () => {
@@ -129,7 +128,6 @@ export class AuthorDetailsComponent implements OnInit {
     });
   }
 
-  // todo duplicate code
   bulkAddBooks(): void {
     const ids = this.selection.selectedIds();
     this.libraryBookService.bulkAdd(ids).subscribe({

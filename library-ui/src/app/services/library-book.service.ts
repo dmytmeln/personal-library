@@ -14,6 +14,7 @@ export interface LibraryBookQueryOptions {
   sort?: string[];
   title?: string;
   status?: LibraryBookStatus | null;
+  location?: string;
   authorId?: number;
   categoryId?: number;
   publishYearMin?: number;
@@ -86,8 +87,19 @@ export class LibraryBookService {
     return this.apiService.put(`/users/me/library-books/${libraryBookId}/details`, {body: dto});
   }
 
+  updateLocation(libraryBookId: number, location: string | null): Observable<LibraryBook> {
+    return this.apiService.put(`/users/me/library-books/${libraryBookId}/location`, {body: {location}});
+  }
+
   resetDetails(libraryBookId: number): Observable<LibraryBook> {
     return this.apiService.put(`/users/me/library-books/${libraryBookId}/details/reset`, {});
+  }
+
+  searchByMood(query: string, status?: LibraryBookStatus | null, limit?: number): Observable<LibraryBook[]> {
+    const params: any = {query};
+    if (status) params.status = status;
+    if (limit) params.limit = limit;
+    return this.apiService.get('/users/me/library-books/search-by-mood', {params});
   }
 
   private buildParams(options: LibraryBookQueryOptions): LibraryBookQueryOptions {
@@ -97,6 +109,7 @@ export class LibraryBookService {
       sort,
       title,
       status,
+      location,
       authorId,
       categoryId,
       publishYearMin,
@@ -113,6 +126,7 @@ export class LibraryBookService {
     if (sort && sort.length > 0) params.sort = sort;
     if (title) params.title = title;
     if (status) params.status = status;
+    if (location) params.location = location;
     if (authorId) params.authorId = authorId;
     if (categoryId) params.categoryId = categoryId;
     if (publishYearMin != null) params.publishYearMin = publishYearMin;

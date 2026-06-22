@@ -1,4 +1,4 @@
-import {Component, DestroyRef, signal, viewChild} from '@angular/core';
+import {Component, signal, viewChild} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatTab, MatTabGroup} from '@angular/material/tabs';
 import {MatIconModule} from '@angular/material/icon';
@@ -15,6 +15,13 @@ import {CategoryListComponent} from '../category-list/category-list.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {TranslocoDirective, TranslocoService} from '@jsverse/transloco';
 import {BookListComponent} from '../book-list/book-list.component';
+import {FormsModule} from '@angular/forms';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {RecommendationService} from '../services/recommendation.service';
+import {BookCardComponent} from '../book-card/book-card.component';
+import {BookListItemComponent} from '../book-list-item/book-list-item.component';
 
 @Component({
   selector: 'app-search',
@@ -32,7 +39,13 @@ import {BookListComponent} from '../book-list/book-list.component';
     BookListComponent,
     MatMenu,
     MatMenuContent,
-    MatMenuItem
+    MatMenuItem,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    BookCardComponent,
+    BookListItemComponent
   ],
   templateUrl: './search.component.html',
   styleUrl: './search.component.scss'
@@ -41,8 +54,13 @@ export class SearchComponent {
 
   private snackCommon: MatSnackCommon;
 
-  readonly bookList = viewChild(BookListComponent);
+  readonly bookListComponent = viewChild(BookListComponent);
   readonly viewMode = signal<'grid' | 'list'>('grid');
+
+  readonly moodQuery = signal<string>('');
+  readonly moodResults = signal<Book[]>([]);
+  readonly loadingMood = signal<boolean>(false);
+  readonly moodSearched = signal<boolean>(false);
 
   private libraryBookIds: Set<number> = new Set<number>();
 
@@ -55,10 +73,29 @@ export class SearchComponent {
   constructor(
     private translocoService: TranslocoService,
     private libraryBookService: LibraryBookService,
-    private destroyRef: DestroyRef,
+    private recommendationService: RecommendationService,
     matSnackBar: MatSnackBar
   ) {
     this.snackCommon = new MatSnackCommon(matSnackBar);
+  }
+
+  onMoodSearch(): void {
+    const query = this.moodQuery().trim();
+    if (!query) return;
+
+    this.loadingMood.set(true);
+    this.moodSearched.set(false);
+    this.recommendationService.searchByMood(query, 10).subscribe({
+      next: results => {
+        this.moodResults.set(results);
+        this.loadingMood.set(false);
+        this.moodSearched.set(true);
+      },
+      error: err => {
+        this.snackCommon.showError(err);
+        this.loadingMood.set(false);
+      }
+    });
   }
 
   addBookToLibrary(book: Book): void {
@@ -77,7 +114,7 @@ export class SearchComponent {
   }
 
   bulkAddBooks(): void {
-    const list = this.bookList();
+    const list = this.bookListComponent();
     if (!list) return;
     const ids = list.selection.selectedIds();
     this.libraryBookService.bulkAdd(ids).subscribe({
@@ -102,22 +139,18 @@ export class SearchComponent {
 
   showAuthorBooks(author: Author): void {
     this.uiState.activeTabIndex = 0;
-    setTimeout(() => {
-      const list = this.bookList();
-      if (list) {
-        list.onAuthorSelected(author);
-      }
-    });
+    const bookListComponent = this.bookListComponent();
+    if (bookListComponent) {
+      bookListComponent.onAuthorSelected(author);
+    }
   }
 
   goToCategoryBooks(category: Category): void {
     this.uiState.activeTabIndex = 0;
-    setTimeout(() => {
-      const list = this.bookList();
-      if (list) {
-        list.onCategorySelected(category);
-      }
-    });
+    const bookListComponent = this.bookListComponent();
+    if (bookListComponent) {
+      bookListComponent.onCategorySelected(category);
+    }
   }
 
 }

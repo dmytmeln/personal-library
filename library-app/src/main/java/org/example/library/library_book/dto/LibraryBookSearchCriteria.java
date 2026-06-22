@@ -14,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 public class LibraryBookSearchCriteria {
     private String title;
+    private String location;
     private LibraryBookStatus status;
     private Integer authorId;
     private Integer categoryId;

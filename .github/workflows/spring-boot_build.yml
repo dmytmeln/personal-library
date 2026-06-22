@@ -6,6 +6,7 @@ on:
     paths:
       - 'library-app/**'
       - '.github/workflows/spring-boot_build.yml'
+  workflow_call:
 
 jobs:
   build:
@@ -37,3 +38,10 @@ jobs:
             -Dsonar.login=${{ secrets.SONAR_TOKEN }} \
             -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml \
             -Dsonar.qualitygate.wait=false
+
+      - name: Upload JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-jar
+          path: library-app/target/*.jar
+          retention-days: 1

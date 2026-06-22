@@ -7,7 +7,7 @@ import org.example.library.book.dto.BookSearchParams;
 import org.example.library.book.dto.LanguageWithCount;
 import org.example.library.book.service.BookDetailsService;
 import org.example.library.book.service.BookService;
-import org.example.library.pagination.PaginationParams;
+import org.example.library.common.pagination.PaginationParams;
 import org.example.library.security.UserPrincipal;
 import org.springframework.data.domain.Page;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

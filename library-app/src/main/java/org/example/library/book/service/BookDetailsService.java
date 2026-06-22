@@ -5,7 +5,7 @@ import org.example.library.book.dto.BookDetails;
 import org.example.library.book.mapper.BookMapper;
 import org.example.library.book.repository.BookDisplayViewRepository;
 import org.example.library.collection.service.CollectionService;
-import org.example.library.exception.NotFoundException;
+import org.example.library.common.exception.NotFoundException;
 import org.example.library.library_book.mapper.LibraryBookMapper;
 import org.example.library.library_book.repository.LibraryBookRepository;
 import org.example.library.library_book.repository.LibraryBookViewRepository;

@@ -32,6 +32,7 @@ public class CollectionBook implements Persistable<CollectionBookId> {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @MapsId("libraryBookId")
     @JoinColumn(name = "library_book_id", nullable = false)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private LibraryBook libraryBook;
 
     @ManyToOne(fetch = FetchType.LAZY)

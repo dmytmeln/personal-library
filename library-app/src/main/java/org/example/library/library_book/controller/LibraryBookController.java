@@ -6,7 +6,7 @@ import org.example.library.book.dto.LanguageWithCount;
 import org.example.library.library_book.domain.LibraryBookStatus;
 import org.example.library.library_book.dto.*;
 import org.example.library.library_book.service.LibraryBookService;
-import org.example.library.pagination.PaginationParams;
+import org.example.library.common.pagination.PaginationParams;
 import org.example.library.security.UserPrincipal;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -36,6 +36,15 @@ public class LibraryBookController {
     @ResponseStatus(HttpStatus.OK)
     public List<LanguageWithCount> getLanguages(@AuthenticationPrincipal UserPrincipal userPrincipal) {
         return service.getLanguagesByUserId(userPrincipal.getId());
+    }
+
+    @GetMapping("/search-by-mood")
+    @ResponseStatus(HttpStatus.OK)
+    public List<LibraryBookDto> searchByMood(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                             @RequestParam String query,
+                                             @RequestParam(required = false) LibraryBookStatus status,
+                                             @RequestParam(required = false) Integer limit) {
+        return service.searchByMood(query, status, userPrincipal.getId(), limit);
     }
 
     @PostMapping
@@ -81,6 +90,15 @@ public class LibraryBookController {
                                        @RequestParam LibraryBookStatus status
     ) {
         return service.updateStatus(libraryBookId, userPrincipal.getId(), status);
+    }
+
+    @PutMapping("/{libraryBookId}/location")
+    @ResponseStatus(HttpStatus.OK)
+    public LibraryBookDto updateLocation(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                         @PathVariable Integer libraryBookId,
+                                         @Valid @RequestBody LocationDto dto
+    ) {
+        return service.updateLocation(libraryBookId, userPrincipal.getId(), dto);
     }
 
     @PutMapping("/bulk-status")

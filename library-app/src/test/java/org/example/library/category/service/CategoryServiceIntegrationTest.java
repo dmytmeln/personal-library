@@ -9,10 +9,10 @@ import org.example.library.category.domain.CategoryTranslation;
 import org.example.library.category.dto.CategorySearchParams;
 import org.example.library.category.repository.CategoryRepository;
 import org.example.library.config.BaseIntegrationTest;
-import org.example.library.exception.NotFoundException;
+import org.example.library.common.exception.NotFoundException;
 import org.example.library.library_book.domain.LibraryBook;
 import org.example.library.library_book.repository.LibraryBookRepository;
-import org.example.library.pagination.PaginationParams;
+import org.example.library.common.pagination.PaginationParams;
 import org.example.library.user.domain.User;
 import org.example.library.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeAll;
@@ -96,6 +96,23 @@ class CategoryServiceIntegrationTest extends BaseIntegrationTest {
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getName()).isEqualTo("Fiction");
         assertThat(result.getContent().get(0).getBooksCount()).isEqualTo(2);
+    }
+
+    @Test
+    void shouldFindCategoryWithTypo() {
+        saveCategory("History");
+        em.flush();
+        em.clear();
+        var pagination = new PaginationParams();
+        pagination.setPage(0);
+        pagination.setSize(10);
+        var searchParams = new CategorySearchParams();
+        searchParams.setName("Histoy");
+
+        var result = service.search(pagination, searchParams);
+
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).getName()).isEqualTo("History");
     }
 
     @Test

@@ -5,11 +5,13 @@ import {catchError, filter, switchMap, take} from 'rxjs/operators';
 import {AuthService} from './auth.service';
 import {Router} from '@angular/router';
 
+type RefreshState = 'WAITING' | 'READY';
+
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
 
   private isRefreshing = false;
-  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
+  private refreshStateSubject = new BehaviorSubject<RefreshState>('READY');
 
   constructor(private authService: AuthService, private router: Router) {
   }
@@ -17,7 +19,7 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     return next.handle(req).pipe(
       catchError((error) => {
-        if (error instanceof HttpErrorResponse && error.status === 401 && !req.url.includes('/auth/authenticate')) {
+        if (this.isUnauthorizedError(error, req)) {
           return this.handle401Error(req, next);
         }
         return throwError(() => error);
@@ -25,28 +27,52 @@ export class AuthInterceptor implements HttpInterceptor {
     );
   }
 
+  private isUnauthorizedError(error: any, req: HttpRequest<any>): boolean {
+    return this.is401Error(error) && !this.isAuthEndpoint(req.url);
+  }
+
+  private is401Error(error: any): boolean {
+    return error instanceof HttpErrorResponse && error.status === 401;
+  }
+
+  private isAuthEndpoint(url: string): boolean {
+    return url.includes('/auth/authenticate') || url.includes('/auth/refresh');
+  }
+
   private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     if (this.isRefreshing) {
-      return this.refreshTokenSubject.pipe(
-        filter(result => result !== null),
-        take(1),
-        switchMap(() => next.handle(request))
-      );
+      return this.enqueueRequestUntilTokenRefreshed(request, next);
     }
+    return this.refreshAccessTokenAndRetry(request, next);
+  }
+
+  private enqueueRequestUntilTokenRefreshed(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    return this.refreshStateSubject.pipe(
+      filter(state => state === 'READY'),
+      take(1),
+      switchMap(() => next.handle(request))
+    );
+  }
+
+  private refreshAccessTokenAndRetry(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    const skipRedirect = request.headers.get('X-Skip-Auth-Redirect') === 'true';
 
     this.isRefreshing = true;
-    this.refreshTokenSubject.next(null);
+    this.refreshStateSubject.next('WAITING');
 
     return this.authService.refreshToken().pipe(
       switchMap(() => {
         this.isRefreshing = false;
-        this.refreshTokenSubject.next(true);
+        this.refreshStateSubject.next('READY');
         return next.handle(request);
       }),
       catchError((err) => {
         this.isRefreshing = false;
+        this.refreshStateSubject.next('READY');
         this.authService.logoutLocally();
-        this.router.navigate(['/login']);
+        if (!skipRedirect) {
+          this.router.navigate(['/login']);
+        }
         return throwError(() => err);
       })
     );

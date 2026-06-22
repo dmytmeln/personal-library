@@ -194,7 +194,10 @@ export class AdminBookDetailsComponent implements OnInit {
     if (!this.bookId) return;
 
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: {message: this.translocoService.translate('common.confirmDelete')}
+      data: {
+        message: this.translocoService.translate('common.confirmDelete'),
+        confirmLabel: 'common.delete'
+      }
     });
 
     dialogRef.afterClosed().subscribe(confirmed => {

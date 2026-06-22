@@ -26,9 +26,7 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelog-tables/changeset/create_table_notes.yaml
   - include:
-      file: db/changelog/changelog-tables/changeset/create_table_tf_idf.yaml
-  - include:
-      file: db/changelog/changelog-tables/changeset/create_table_vocabulary_metadata.yaml
+      file: db/changelog/changelog-tables/changeset/create_table_quotes.yaml
   - include:
       file: db/changelog/changelog-tables/changeset/create_table_user_profile_vectors.yaml
   - include:
@@ -42,15 +40,13 @@ databaseChangeLog:
   - include:
       file: db/changelog/changelog-indexes/changeset/create_index_books.yaml
   - include:
-      file: db/changelog/changelog-indexes/changeset/create_index_books_vectors.yaml
+      file: db/changelog/changelog-indexes/changeset/create_index_books_embedding.yaml
   - include:
       file: db/changelog/changelog-indexes/changeset/create_index_book_authors.yaml
   - include:
       file: db/changelog/changelog-indexes/changeset/create_index_collection_books.yaml
   - include:
       file: db/changelog/changelog-indexes/changeset/create_trgm_indexes.yaml
-  - include:
-      file: db/changelog/changelog-indexes/changeset/create_index_tf_idf_vocabulary.yaml
   - include:
       file: db/changelog/changelog-functions/changeset/create_function_get_collection_subtree_ids.yaml
   - include:
@@ -69,3 +65,5 @@ databaseChangeLog:
       file: db/changelog/changelog-tables/changeset/seed_data.yaml
   - include:
       file: db/changelog/changelog-tables/changeset/seed_user.yaml
+  - include:
+      file: db/changelog/changelog-tables/changeset/add_cascade_delete_to_library_books_relations.yaml

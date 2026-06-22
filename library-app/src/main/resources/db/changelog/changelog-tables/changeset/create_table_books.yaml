@@ -40,8 +40,8 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: description_vector
-                  type: vector(1100)
+                  name: embedding
+                  type: vector(384)
                   constraints:
                     nullable: true
               - column:
@@ -50,11 +50,6 @@ databaseChangeLog:
                   defaultValue: NEW
                   constraints:
                     nullable: false
-              - column:
-                  name: vector_version
-                  type: integer
-                  constraints:
-                    nullable: true
               - column:
                   name: popularity_count
                   type: integer

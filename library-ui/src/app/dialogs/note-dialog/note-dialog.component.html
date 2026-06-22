@@ -9,6 +9,44 @@
       </div>
     }
 
+    <div class="recording-section">
+      <button 
+        mat-raised-button 
+        color="primary"
+        (click)="startRecording()"
+        [disabled]="audioRecorder.isRecording() || isProcessing || saving">
+        <mat-icon>mic</mat-icon>
+        Record Voice Note
+      </button>
+
+      <button 
+        mat-raised-button 
+        color="warn"
+        (click)="stopAndUpload()"
+        [disabled]="!audioRecorder.isRecording() || isProcessing">
+        <mat-icon>stop</mat-icon>
+        Stop & Upload
+      </button>
+
+      @if (audioRecorder.isRecording()) {
+        <div class="duration">
+          {{ audioRecorder.duration() }}s / {{ audioRecorder.MAX_DURATION }}s
+        </div>
+      }
+
+      @if (isProcessing) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        <div class="processing-text">Processing voice note...</div>
+      }
+    </div>
+
+    @if (showTranscript && rawTranscript) {
+      <div class="transcript-section">
+        <h3>Raw Transcript</h3>
+        <p class="transcript-text">{{ rawTranscript }}</p>
+      </div>
+    }
+
     <mat-form-field appearance="outline" class="note-field">
       <mat-label>{{ t('label') }}</mat-label>
       <textarea matInput [formControl]="noteControl" rows="12" [placeholder]="t('placeholder')"></textarea>
@@ -23,6 +61,9 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end" *transloco="let c; prefix: 'common'">
+    @if (note) {
+      <button mat-button color="warn" (click)="onDelete()" [disabled]="loading || saving">{{ c('delete') }}</button>
+    }
     <button mat-button color="warn" (click)="onClear()" [disabled]="loading || saving || !noteControl.value">{{ c('clear') }}</button>
     <span class="spacer"></span>
     <button mat-button (click)="onCancel()" [disabled]="saving">{{ c('cancel') }}</button>

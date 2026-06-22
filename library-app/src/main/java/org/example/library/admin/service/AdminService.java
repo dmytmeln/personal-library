@@ -15,8 +15,8 @@ import org.example.library.book.repository.BookRepository;
 import org.example.library.category.domain.Category;
 import org.example.library.category.domain.CategoryTranslation;
 import org.example.library.category.repository.CategoryRepository;
-import org.example.library.exception.BadRequestException;
-import org.example.library.exception.NotFoundException;
+import org.example.library.common.exception.BadRequestException;
+import org.example.library.common.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

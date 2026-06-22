@@ -1,11 +1,10 @@
 <div class="bulk-action-bar-container" [class.visible]="selectedCount() > 0">
   <mat-toolbar color="primary" class="bulk-toolbar">
     <div class="selection-info">
-      <button mat-icon-button (click)="clear.emit()" matTooltip="Скасувати вибір">
+      <button mat-icon-button (click)="clear.emit()" [matTooltip]="'common.cancelSelection' | transloco">
         <mat-icon>close</mat-icon>
       </button>
-<!--      TODO FIX TO USE LOCALIZATION-->
-      <span class="count-text">Вибрано: {{ selectedCount() }}</span>
+      <span class="count-text">{{ 'common.selectedCount' | transloco: { count: selectedCount() } }}</span>
     </div>
 
     <div class="spacer"></div>

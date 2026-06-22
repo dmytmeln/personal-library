@@ -36,10 +36,20 @@ import {AuthorListComponent} from '../author-list/author-list.component';
 import {CategoryListComponent} from '../category-list/category-list.component';
 import {UpdateLibraryBookDetails} from '../interfaces/update-library-book-details';
 import {NoteDialogComponent} from '../dialogs/note-dialog/note-dialog.component';
+import {LocationDialogComponent} from '../dialogs/location-dialog/location-dialog.component';
+import {QuotesListDialogComponent} from '../dialogs/quotes-list-dialog/quotes-list-dialog.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import {LibraryStore} from '../services/library.store';
 import {BookListComponent} from '../book-list/book-list.component';
 import {CreateLocalBookDialogComponent} from '../dialogs/create-local-book-dialog/create-local-book-dialog.component';
+import {FormsModule} from '@angular/forms';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
+import {BookCardComponent} from '../book-card/book-card.component';
+import {BookListItemComponent} from '../book-list-item/book-list-item.component';
+import {SelectionStore} from '../services/selection.store';
+import {MatFormFieldModule} from '@angular/material/form-field';
+import {MatInputModule} from '@angular/material/input';
 
 @Component({
   selector: 'app-library',
@@ -58,6 +68,13 @@ import {CreateLocalBookDialogComponent} from '../dialogs/create-local-book-dialo
     TranslocoDirective,
     BookListComponent,
     MatButtonToggleModule,
+    FormsModule,
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
+    BookCardComponent,
+    BookListItemComponent,
+    MatFormFieldModule,
+    MatInputModule
   ],
   templateUrl: './library.component.html',
   styleUrl: './library.component.scss',
@@ -69,6 +86,12 @@ export class LibraryComponent implements OnInit {
   readonly statusOptions = signal<{ value: LibraryBookStatus; label: string }[]>([]);
 
   readonly viewMode = signal<'grid' | 'list'>('grid');
+
+  readonly moodQuery = signal<string>('');
+  readonly moodResults = signal<LibraryBook[]>([]);
+  readonly loadingMood = signal<boolean>(false);
+  readonly moodSearched = signal<boolean>(false);
+  readonly onlyToRead = signal<boolean>(false);
 
   uiState = {
     activeTabIndex: 0,
@@ -102,6 +125,27 @@ export class LibraryComponent implements OnInit {
     ).subscribe(options => this.statusOptions.set(options));
   }
 
+  onMoodSearch(): void {
+    const query = this.moodQuery().trim();
+    if (!query) return;
+
+    this.loadingMood.set(true);
+    this.moodSearched.set(false);
+    const status = this.onlyToRead() ? LibraryBookStatus.TO_READ : null;
+
+    this.libraryBookService.searchByMood(query, status, 10).subscribe({
+      next: results => {
+        this.moodResults.set(results);
+        this.loadingMood.set(false);
+        this.moodSearched.set(true);
+      },
+      error: err => {
+        this.snackCommon.showError(err);
+        this.loadingMood.set(false);
+      }
+    });
+  }
+
   onTabChange(index: number): void {
     this.uiState.activeTabIndex = index;
     if (index === 1) this.uiState.authorsOpened = true;
@@ -128,11 +172,6 @@ export class LibraryComponent implements OnInit {
 
   deleteLibraryBook(libraryBook: LibraryBook): void {
     this.collectionService.getCollectionsContainingBook(libraryBook.id).subscribe(collections => {
-      if (collections.length === 0) {
-        this.performDelete(libraryBook);
-        return;
-      }
-
       const dialogRef = this.dialog.open(DeleteLibraryBookDialog, {
         data: {
           bookTitle: libraryBook.book.title,
@@ -246,7 +285,10 @@ export class LibraryComponent implements OnInit {
   removeFromAllCollections(libraryBook: LibraryBook): void {
     const message = this.translocoService.translate('library.removeFromAllCollectionsConfirm', {title: libraryBook.book.title});
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
-      data: {message}
+      data: {
+        message,
+        confirmLabel: 'common.remove'
+      }
     });
 
     dialogRef.afterClosed().pipe(filter(Boolean)).subscribe(() => {
@@ -330,6 +372,28 @@ export class LibraryComponent implements OnInit {
       } else if (result === 'deleted') {
         this.snackCommon.showSuccess(this.translocoService.translate('library.success.noteDeleted'));
       }
+    });
+  }
+
+  openQuotesDialog(libraryBook: LibraryBook): void {
+    this.dialog.open(QuotesListDialogComponent, {
+      data: {
+        libraryBookId: libraryBook.id,
+        bookTitle: libraryBook.book.title
+      },
+      width: '600px'
+    });
+  }
+
+  openLocationDialog(libraryBook: LibraryBook): void {
+    this.dialog.open(LocationDialogComponent, {
+      data: {
+        libraryBookId: libraryBook.id,
+        location: libraryBook.location
+      }
+    }).afterClosed().pipe(filter(Boolean)).subscribe(() => {
+      this.loadBooks();
+      this.snackCommon.showSuccess(this.translocoService.translate('common.success.saved'));
     });
   }
 

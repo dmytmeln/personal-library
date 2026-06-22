@@ -5,7 +5,7 @@ import org.example.library.category.dto.CategoryDto;
 import org.example.library.category.dto.CategorySearchParams;
 import org.example.library.category.dto.CategoryWithBooksCount;
 import org.example.library.category.service.CategoryService;
-import org.example.library.pagination.PaginationParams;
+import org.example.library.common.pagination.PaginationParams;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

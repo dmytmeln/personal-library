@@ -5,6 +5,10 @@ spring:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/postgres}
     username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:postgres}
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
 
   jpa:
     hibernate:
@@ -44,6 +48,18 @@ application:
       refresh-cookie-name: library_app_jwt_refresh_token
       refresh-id-cookie-name: library_app_jwt_refresh_id
       token-cleanup-cron: "0 0 3 * * ?"
+  ai:
+    groq:
+      api-key: ${GROQ_API_KEY:}
+      base-url: https://api.groq.com/openai/v1
+      model: whisper-large-v3-turbo
+    gemini:
+      api-key: ${GEMINI_API_KEY:}
+      model: gemini-2.5-flash
+      temperature: 0.7
+  voice-note:
+    max-duration-seconds: 180
+    min-duration-seconds: 1
 
 management:
   endpoints:

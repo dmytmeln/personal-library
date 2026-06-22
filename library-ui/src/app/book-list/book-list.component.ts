@@ -63,7 +63,8 @@ const EMPTY_BOOK_FILTERS: BaseBookFilters = {
 const EMPTY_LIBRARY_FILTERS: LibraryFilters = {
   ...EMPTY_BOOK_FILTERS,
   status: null,
-  rating: {min: null, max: null}
+  rating: {min: null, max: null},
+  location: ''
 };
 
 @Component({
@@ -140,6 +141,7 @@ export class BookListComponent implements OnInit {
     if (this.mode() === 'library') {
       if (f.status) count++;
       if (f.rating.min || f.rating.max) count++;
+      if (f.location) count++;
     }
     return count;
   });
@@ -241,6 +243,7 @@ export class BookListComponent implements OnInit {
       options.status = f.status;
       options.ratingMin = f.rating.min ?? undefined;
       options.ratingMax = f.rating.max ?? undefined;
+      options.location = f.location || undefined;
     }
 
     const request: Observable<Page<any>> = isLibrary
@@ -324,7 +327,7 @@ export class BookListComponent implements OnInit {
         f.languages.length > 0;
 
       if (this.mode() === 'library') {
-        active = active || f.status !== null || f.rating.min !== null || f.rating.max !== null;
+        active = active || f.status !== null || f.rating.min !== null || f.rating.max !== null || (f.location !== undefined && f.location !== '');
       }
       return active;
     });
@@ -355,4 +358,5 @@ export class BookListComponent implements OnInit {
       this.loadBooks();
     });
   }
+
 }

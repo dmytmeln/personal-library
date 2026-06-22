@@ -55,6 +55,9 @@ public class LibraryBook {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "location")
+    private String location;
+
     @Column(name = "custom_author_name")
     private String customAuthorName;
 

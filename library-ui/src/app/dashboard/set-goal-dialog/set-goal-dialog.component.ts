@@ -67,7 +67,8 @@ export class SetGoalDialogComponent {
   delete(): void {
     const dialogRef = this.dialog.open(ConfirmationDialogComponent, {
       data: {
-        message: this.translocoService.translate('dashboard.deleteConfirm', { year: this.data.year })
+        message: this.translocoService.translate('dashboard.deleteConfirm', { year: this.data.year }),
+        confirmLabel: 'common.delete'
       }
     });
 

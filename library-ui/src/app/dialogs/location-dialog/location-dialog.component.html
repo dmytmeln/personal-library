@@ -1,0 +1,33 @@
+<div *transloco="let t; prefix: 'dialogs.location'" class="dialog-container">
+  <h2 mat-dialog-title>{{ t('title') }}</h2>
+
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ t('label') }}</mat-label>
+      <textarea matInput
+                rows="4"
+                [formControl]="locationControl"
+                [placeholder]="t('placeholder')"></textarea>
+      @if (locationControl.value) {
+        <button matSuffix mat-icon-button aria-label="Clear" (click)="onClear()">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+      @if (locationControl.hasError('maxlength')) {
+        <mat-error>Maximum 255 characters</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" *transloco="let c; prefix: 'common'">
+    <button mat-button (click)="onCancel()" [disabled]="saving">
+      {{ c('cancel') }}
+    </button>
+    <button mat-flat-button
+            color="primary"
+            (click)="onSave()"
+            [disabled]="locationControl.invalid || saving">
+      {{ c('save') }}
+    </button>
+  </mat-dialog-actions>
+</div>

@@ -29,7 +29,33 @@ databaseChangeLog:
                   name: content
                   type: text
                   constraints:
+                    nullable: true
+              - column:
+                  name: note_type
+                  type: varchar(20)
+                  defaultValue: TEXT
+                  constraints:
                     nullable: false
+              - column:
+                  name: raw_transcript
+                  type: text
+                  constraints:
+                    nullable: true
+              - column:
+                  name: transcription_model
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: formatting_model
+                  type: varchar(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: voice_created_at
+                  type: timestamp
+                  constraints:
+                    nullable: true
               - column:
                   name: created_at
                   type: timestamp

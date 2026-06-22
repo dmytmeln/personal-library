@@ -1,0 +1,35 @@
+databaseChangeLog:
+  - changeSet:
+      id: add_cascade_delete_to_library_books_relations
+      author: Dmytro Melnyk
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: notes
+            constraintName: notes_library_books_fk
+        - addForeignKeyConstraint:
+            baseTableName: notes
+            baseColumnNames: library_book_id
+            constraintName: notes_library_books_fk
+            referencedTableName: library_books
+            referencedColumnNames: library_book_id
+            onDelete: CASCADE
+        - dropForeignKeyConstraint:
+            baseTableName: quotes
+            constraintName: quotes_library_books_fk
+        - addForeignKeyConstraint:
+            baseTableName: quotes
+            baseColumnNames: library_book_id
+            constraintName: quotes_library_books_fk
+            referencedTableName: library_books
+            referencedColumnNames: library_book_id
+            onDelete: CASCADE
+        - dropForeignKeyConstraint:
+            baseTableName: collection_books
+            constraintName: collection_books_library_books_fk
+        - addForeignKeyConstraint:
+            baseTableName: collection_books
+            baseColumnNames: library_book_id
+            constraintName: collection_books_library_books_fk
+            referencedTableName: library_books
+            referencedColumnNames: library_book_id
+            onDelete: CASCADE
